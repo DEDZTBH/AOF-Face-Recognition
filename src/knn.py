@@ -4,6 +4,7 @@ from PIL import ImageDraw, ImageFont
 import random
 import time
 
+
 font = ImageFont.truetype('fonts/Arial Bold.ttf', 12)
 
 
