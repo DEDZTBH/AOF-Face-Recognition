@@ -1,13 +1,15 @@
 import face_recognition
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 import pickle
 from src.preprocess import get_encodings
 from src.util import face_distance_to_conf
 import re
 import numpy as np
+import random
 
 
 regex_exp = r'^[0-9.]*([A-Za-z \-\']+\.[A-Za-z \-\']+)\..*$'
+font = ImageFont.truetype('fonts/Arial Bold.ttf', 12)
 
 
 def transform_2017_photos(filename):
@@ -17,7 +19,7 @@ def transform_2017_photos(filename):
     return p
 
 
-recover = False
+recover = True
 if recover:
     with open('saved.pkl', 'rb') as file:
         saved = pickle.load(file)
@@ -73,12 +75,12 @@ def predict(filename, tolerance, known_face_encodings, known_face_names, showimg
             draw.rectangle(((left, top), (right, bottom)), outline=(0, 0, 255))
 
             # Draw a label with a name below the face
-            text_width, text_height = draw.textsize(name)
-            draw.rectangle(((left, bottom - text_height - 10), (right, bottom)), fill=(0, 0, 255), outline=(0, 0, 255))
+            # text_width, text_height = draw.textsize(name)
+            # draw.rectangle(((left, bottom - text_height - 10), (right, bottom)), fill=(0, 0, 255), outline=(0, 0, 255))
 
-            draw.text((left + 6, bottom - text_height - 5), name +
-                      ';Conf@{:.2}'.format(face_distance_to_conf(face_dis.min(), tolerance)),
-                      fill=(255, 255, 255, 255))
+            draw.text((left + 6, bottom + random.randint(0, 20)), name +
+                      '({:.1f}%)'.format(face_distance_to_conf(face_dis.min(), tolerance) * 100),
+                      fill=(0, 210, 0, 255), font=font)
 
         # Remove the drawing library from memory as per the Pillow docs
         del draw
@@ -88,6 +90,12 @@ def predict(filename, tolerance, known_face_encodings, known_face_names, showimg
 
 
 predict('unknown/51341390_10156668527250236_6458268350773460992_o.jpg',
+        0.54,
+        known_face_encodings,
+        known_face_names,
+        True)
+
+predict('unknown/2019PoetryFinalFour.jpg',
         0.54,
         known_face_encodings,
         known_face_names,
