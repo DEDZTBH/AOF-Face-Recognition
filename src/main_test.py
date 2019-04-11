@@ -2,22 +2,10 @@ import face_recognition
 from PIL import Image, ImageDraw, ImageFont
 import pickle
 from src.preprocess import get_encodings
-from src.util import face_distance_to_conf
-import re
+from src.util import face_distance_to_conf, transform_2017_photos
 import numpy as np
-import random
 
-
-regex_exp = r'^[0-9.]*([A-Za-z \-\']+\.[A-Za-z \-\']+)\..*$'
 font = ImageFont.truetype('fonts/Arial Bold.ttf', 12)
-
-
-def transform_2017_photos(filename):
-    print(filename)
-    p = re.match(regex_exp, filename).group(1).replace('.', ' ')
-    print(p)
-    return p
-
 
 recover = True
 if recover:
@@ -78,7 +66,7 @@ def predict(filename, tolerance, known_face_encodings, known_face_names, showimg
             # text_width, text_height = draw.textsize(name)
             # draw.rectangle(((left, bottom - text_height - 10), (right, bottom)), fill=(0, 0, 255), outline=(0, 0, 255))
 
-            draw.text((left + 6, bottom + random.randint(0, 20)), name +
+            draw.text((left + 6, bottom + np.random.randint(0, 20)), name +
                       '({:.1f}%)'.format(face_distance_to_conf(face_dis.min(), tolerance) * 100),
                       fill=(0, 210, 0, 255), font=font)
 

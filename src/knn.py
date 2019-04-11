@@ -4,7 +4,6 @@ from PIL import ImageDraw, ImageFont
 import random
 import time
 
-
 font = ImageFont.truetype('fonts/Arial Bold.ttf', 12)
 
 
@@ -52,7 +51,6 @@ def show_prediction_labels_on_image(X_img, face_locations, predictions):
 
     # Loop through each face found in the unknown image
     for (top, right, bottom, left), name in zip(face_locations, predictions):
-
         # Draw a box around the face using the Pillow module
         draw.rectangle(((left, top), (right, bottom)), outline=(0, 0, 255))
 
@@ -64,7 +62,6 @@ def show_prediction_labels_on_image(X_img, face_locations, predictions):
 
     # Display the resulting image
     X_img.show()
-
 
 # if __name__ == "__main__":
 #     # STEP 1: Train the KNN classifier and save it to disk

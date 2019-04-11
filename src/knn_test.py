@@ -1,21 +1,11 @@
 import pickle
 from src.preprocess import get_encodings
-import re
 from src.knn import knn_generate, predict, show_prediction_labels_on_image
 import face_recognition
 from PIL import Image
 import math
 
-
-regex_exp = r'^[0-9.]*([A-Za-z \-\']+\.[A-Za-z \-\']+)\..*$'
-
-
-def transform_2017_photos(filename):
-    print(filename)
-    p = re.match(regex_exp, filename).group(1).replace('.', ' ')
-    print(p)
-    return p
-
+from src.util import transform_2017_photos
 
 save_name = 'saved_no_gitter.pkl'
 recover = False
@@ -24,7 +14,8 @@ if recover:
         saved = pickle.load(file)
         (known_face_encodings, known_face_names) = saved
 else:
-    known_face_encodings, known_face_names = get_encodings('2017 photos', file_name_transform=transform_2017_photos, num_jitters=0)
+    known_face_encodings, known_face_names = get_encodings('2017 photos', file_name_transform=transform_2017_photos,
+                                                           num_jitters=0)
     with open(save_name, 'wb') as file:
         pickle.dump((known_face_encodings, known_face_names), file)
 
