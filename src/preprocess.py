@@ -117,6 +117,6 @@ def get_encoding_for_known_face(imgs_array, rescan=False, num_jitters=0):
             face_locs = None
         else:
             face_locs = [[0, x_np.shape[1] - 1, x_np.shape[0] - 1, 1]]
-        return face_recognition.face_encodings(x_np, face_locs, num_jitters=num_jitters)
+        return face_recognition.face_encodings(x_np, face_locs, num_jitters=num_jitters)[0]
 
     return list(map(process, imgs_array))

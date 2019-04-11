@@ -1,25 +1,22 @@
-import pickle
 from src.preprocess import get_encodings
 from src.knn import knn_generate, predict, show_prediction_labels_on_image
 import face_recognition
 from PIL import Image
 import math
+from src.preprocess_test import new_X, new_y
 
-from src.util import transform_2017_photos
+from src.util import transform_2017_photos, load, save
 
-save_name = 'saved_no_gitter.pkl'
-recover = False
-if recover:
-    with open(save_name, 'rb') as file:
-        saved = pickle.load(file)
-        (known_face_encodings, known_face_names) = saved
-else:
-    known_face_encodings, known_face_names = get_encodings('2017 photos', file_name_transform=transform_2017_photos,
-                                                           num_jitters=0)
-    with open(save_name, 'wb') as file:
-        pickle.dump((known_face_encodings, known_face_names), file)
+# save_name = 'saved_augmented'
+# recover = False
+# if recover:
+#     (known_face_encodings, known_face_names) = load(save_name)
+# else:
+#     known_face_encodings, known_face_names = get_encodings('2017 photos', file_name_transform=transform_2017_photos,
+#                                                            num_jitters=0)
+#     save((known_face_encodings, known_face_names), save_name)
 
-knn_trained = knn_generate(known_face_encodings, known_face_names, verbose=True)
+knn_trained = knn_generate(new_X, new_y, verbose=True)
 
 # predict([known_face_encodings[0]], knn_trained)
 
@@ -32,6 +29,6 @@ pil_image = Image.fromarray(unknown_image)
 
 predictions = predict(face_encodings, knn_trained,
                       distance_threshold=0.54,
-                      n_neighbors=int(round(math.sqrt(len(known_face_encodings)))))
+                      n_neighbors=int(round(math.sqrt(len(new_X)))))
 
 show_prediction_labels_on_image(pil_image, face_locations, predictions)
