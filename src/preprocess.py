@@ -23,7 +23,7 @@ def get_encodings(location="known", file_name_transform=lambda x: x, num_jitters
 
 
 def get_encodings_from_pics(pics, num_jitters=1):
-    return list(map(lambda pic: face_recognition.face_encodings(pic, num_jitters=num_jitters)[0], pics))
+    return [face_recognition.face_encodings(pic, num_jitters=num_jitters)[0] for pic in pics]
 
 
 def get_face_pics(location="known", file_name_transform=lambda x: x, face_only=True, resize_to_square=None):
@@ -51,7 +51,7 @@ def get_face_pics(location="known", file_name_transform=lambda x: x, face_only=T
             if width != height:
                 new_width_height = int(np.average((width, height)))
                 raw_photo_to_add = raw_photo_to_add.resize((new_width_height, new_width_height))
-                print('Image of {} has size {}x{}, resize to {}'.format(name, width, height, new_width_height))
+                # print('Image of {} has size {}x{}, resize to {}'.format(name, width, height, new_width_height))
 
         known_faces.append(np.array(raw_photo_to_add))
 
@@ -91,7 +91,7 @@ def dict_to_training_set(X_y_dict, max_exist_training_set_num=None, shuffle_trai
 
 
 def max_training_set_num(X_y_dict):
-    return max(list(map(lambda x: len(x), X_y_dict.values())))
+    return max([len(x) for x in X_y_dict.values()])
 
 
 def get_equal_number_training_set(X_y_dict, max_exist_training_set_num=None, generate_extra_for_each=0):
@@ -120,3 +120,18 @@ def get_encoding_for_known_face(imgs_array, rescan=False, num_jitters=0):
         return face_recognition.face_encodings(x_np, face_locs, num_jitters=num_jitters)[0]
 
     return list(map(process, imgs_array))
+
+
+def resize_imgs(imgs, height=140, width=140, asarray=True):
+    if asarray:
+        processed_imgs = [Image.fromarray(x) for x in imgs]
+
+        def process(img):
+            return np.asarray(img.resize((height, width)))
+    else:
+        processed_imgs = imgs
+
+        def process(img):
+            return img.resize((height, width))
+
+    return [process(img) for img in processed_imgs]

@@ -32,3 +32,13 @@ def save(stuff, filename, ext='pkl'):
 def load(filename, ext='pkl'):
     with open('{}.{}'.format(filename, ext), 'rb') as file:
         return pickle.load(file)
+
+
+def dict_keys_map_to_numbers(dic, generate_new_dict=True):
+    dict_num_map = []
+    new_dict = {}
+    for key in dic.keys():
+        if generate_new_dict:
+            new_dict[len(dict_num_map)] = dic[key]
+        dict_num_map.append(key)
+    return dict_num_map, new_dict
