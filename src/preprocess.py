@@ -82,15 +82,13 @@ def training_set_to_dict(X, y):
     return X_y_dict
 
 
-def dict_to_training_set(X_y_dict, max_exist_training_set_num=None, shuffle_training_set=False):
-    if max_exist_training_set_num is None:
-        max_exist_training_set_num = max_training_set_num(X_y_dict)
+def dict_to_training_set(X_y_dict, shuffle_training_set=False):
     X = []
     y = []
 
     for key in X_y_dict.keys():
         X += X_y_dict[key]
-        for i in range(max_exist_training_set_num):
+        for _ in X_y_dict[key]:
             y.append(key)
 
     if shuffle_training_set:

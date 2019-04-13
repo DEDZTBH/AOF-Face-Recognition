@@ -2,7 +2,7 @@ from src.preprocess import get_face_pics, training_set_to_dict, max_training_set
     dict_to_training_set, get_encoding_for_known_face
 from src.util import transform_2017_photos, save, load, dict_keys_map_to_numbers
 
-recover = False
+recover = True
 file_name = 'preprocess_test_num_map_jitter_1'
 generate_extra_for_each = 1
 encoding_jitters = 1
@@ -27,8 +27,8 @@ else:
     new_dict, num_map = dict_keys_map_to_numbers(new_X_y_dict)
     orig_new_dict, _ = dict_keys_map_to_numbers(X_y_dict, existing_keys_map=num_map)
 
-    new_X_raw, new_y_num = dict_to_training_set(new_dict, max_t_s_num, shuffle_training_set=True)
-    orig_new_X_raw, orig_new_y = dict_to_training_set(orig_new_dict, max_t_s_num, shuffle_training_set=False)
+    new_X_raw, new_y_num = dict_to_training_set(new_dict, shuffle_training_set=True)
+    orig_new_X_raw, orig_new_y = dict_to_training_set(orig_new_dict, shuffle_training_set=False)
 
     new_X_num = get_encoding_for_known_face(new_X_raw, rescan=True, num_jitters=encoding_jitters)
     orig_new_X_num = get_encoding_for_known_face(orig_new_X_raw, rescan=True, num_jitters=encoding_jitters)
