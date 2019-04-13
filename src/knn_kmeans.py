@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.contrib.factorization import KMeans
 
-from src.preprocess_test_num_map import num_student, new_X_num, new_y_num, num_map
+from src.preprocess_test_num_map import num_student, new_X_num, new_y_num, num_map, orig_new_X_num, orig_new_y
 
 # Parameters
 num_steps = 5000
@@ -50,6 +50,7 @@ with tf.Session() as sess:
     sess.run(init_op, feed_dict={X: full_data_x})
 
     one_hot_y = sess.run(tf.one_hot(new_y_num, num_student))
+    orig_one_hot_y = sess.run(tf.one_hot(orig_new_y, num_student))
 
     # Training
     for i in range(1, num_steps + 1):
@@ -65,7 +66,10 @@ with tf.Session() as sess:
     for i in range(len(idx)):
         counts[idx[i]] += one_hot_y[i]
     # Assign the most frequent label to the centroid
-    labels_map = [np.argmax(c) for c in counts]
+    # labels_map = [np.argmax(c) for c in counts]
+    # Different strategy
+    labels_map = [np.random.choice(np.argwhere(c == np.amax(c)).flatten()) for c in counts]
+
     labels_map = tf.convert_to_tensor(labels_map)
 
     # Evaluation ops
@@ -76,5 +80,5 @@ with tf.Session() as sess:
     accuracy_op = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
     # Test Model
-    test_x, test_y = new_X_num, one_hot_y
+    test_x, test_y = orig_new_X_num, orig_one_hot_y
     print("Test Accuracy:", sess.run(accuracy_op, feed_dict={X: test_x, y: test_y}))

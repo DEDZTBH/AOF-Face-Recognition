@@ -34,11 +34,19 @@ def load(filename, ext='pkl'):
         return pickle.load(file)
 
 
-def dict_keys_map_to_numbers(dic, generate_new_dict=True):
-    dict_num_map = []
+def dict_keys_map_to_numbers(dic, generate_new_dict=True, existing_keys_map=None):
     new_dict = {}
-    for key in dic.keys():
-        if generate_new_dict:
-            new_dict[len(dict_num_map)] = dic[key]
-        dict_num_map.append(key)
-    return dict_num_map, new_dict
+
+    if existing_keys_map is not None:
+        for key in dic.keys():
+            if generate_new_dict:
+                new_dict[existing_keys_map.index(key)] = dic[key]
+        return new_dict, existing_keys_map
+
+    else:
+        dict_num_map = []
+        for key in dic.keys():
+            if generate_new_dict:
+                new_dict[len(dict_num_map)] = dic[key]
+            dict_num_map.append(key)
+        return new_dict, dict_num_map

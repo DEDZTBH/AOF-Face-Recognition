@@ -3,7 +3,7 @@ from src.knn import knn_generate, predict, show_prediction_labels_on_image
 import face_recognition
 from PIL import Image
 import math
-from src.preprocess_test import new_X, new_y_num, max_t_s_num
+from src.preprocess_test import new_X, new_y, max_t_s_num
 
 from src.util import transform_2017_photos, load, save
 
@@ -16,7 +16,7 @@ from src.util import transform_2017_photos, load, save
 #                                                            num_jitters=0)
 #     save((known_face_encodings, known_face_names), save_name)
 
-knn_trained = knn_generate(new_X, new_y_num, verbose=True)
+knn_trained = knn_generate(new_X, new_y, verbose=True)
 
 # predict([known_face_encodings[0]], knn_trained)
 

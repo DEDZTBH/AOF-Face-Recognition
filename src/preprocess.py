@@ -1,6 +1,6 @@
 import os
 import face_recognition
-import dlib
+import tensorflow as tf
 import numpy as np
 from PIL import Image
 
@@ -26,6 +26,15 @@ def get_encodings_from_pics(pics, num_jitters=1):
     return [face_recognition.face_encodings(pic, num_jitters=num_jitters)[0] for pic in pics]
 
 
+def get_face(img):
+    [top, right, bottom, left] = face_recognition.face_locations(np.array(img), model="cnn")[0]
+    return img.crop((left, top, right, bottom))
+
+
+def get_faces(imgs):
+    return [get_face(img) for img in imgs]
+
+
 def get_face_pics(location="known", file_name_transform=lambda x: x, face_only=True, resize_to_square=None):
     if resize_to_square is None:
         resize_to_square = face_only
@@ -43,8 +52,7 @@ def get_face_pics(location="known", file_name_transform=lambda x: x, face_only=T
         raw_photo_to_add = Image.open(os.path.join(directory, filename).decode("utf-8")).convert('RGB')
 
         if face_only:
-            [top, right, bottom, left] = face_recognition.face_locations(np.array(raw_photo_to_add), model="cnn")[0]
-            raw_photo_to_add = raw_photo_to_add.crop((left, top, right, bottom))
+            raw_photo_to_add = get_face(raw_photo_to_add)
 
         if resize_to_square:
             (width, height) = raw_photo_to_add.size
@@ -97,29 +105,50 @@ def max_training_set_num(X_y_dict):
 def get_equal_number_training_set(X_y_dict, max_exist_training_set_num=None, generate_extra_for_each=0):
     if max_exist_training_set_num is None:
         max_exist_training_set_num = max_training_set_num(X_y_dict)
-    for key in X_y_dict.keys():
+
+    jitter_generator = tf.keras.preprocessing.image \
+        .ImageDataGenerator(width_shift_range=0.2,
+                            height_shift_range=0.2,
+                            zoom_range=0.2,
+                            rotation_range=10)
+
+    total_num = len(X_y_dict.keys())
+    for idx, key in enumerate(X_y_dict.keys()):
         generate_list = []
         photos = X_y_dict[key]
         need_to_add_num = max_exist_training_set_num - len(photos) + generate_extra_for_each
         for i in range(need_to_add_num):
             rand_photo = photos[np.random.randint(len(photos))]
-            # print(rand_photo.shape)
-            generate_list += dlib.jitter_image(rand_photo)
+            generate_list.append(jitter_generator.random_transform(rand_photo))
         X_y_dict[key] += generate_list
+
+        if (idx + 1) % 10 == 0 or idx + 1 == total_num:
+            print('Group processed {}/{}'.format(idx + 1, total_num))
     return X_y_dict
 
 
 def get_encoding_for_known_face(imgs_array, rescan=False, num_jitters=0):
-    def process(x):
+    total_num = len(imgs_array)
+
+    def process(x, i):
         x_np = np.asarray(x)
         # print(x_np.shape)
         if rescan:
             face_locs = None
         else:
             face_locs = [[0, x_np.shape[1] - 1, x_np.shape[0] - 1, 1]]
-        return face_recognition.face_encodings(x_np, face_locs, num_jitters=num_jitters)[0]
 
-    return list(map(process, imgs_array))
+        found_face = face_recognition.face_encodings(x_np, face_locs, num_jitters=num_jitters)
+        if len(found_face) != 1:
+            Image.fromarray(x_np).show()
+            raise ValueError("Found {} face(s) in picture".format(len(found_face)))
+
+        if i % 10 == 0 or i == total_num:
+            print('Encoding generated {}/{}'.format(i, total_num))
+
+        return found_face[0]
+
+    return [process(img, i + 1) for i, img in enumerate(imgs_array)]
 
 
 def resize_imgs(imgs, height=140, width=140, asarray=True):
