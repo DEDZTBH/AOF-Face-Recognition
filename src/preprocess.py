@@ -3,6 +3,7 @@ import face_recognition
 import tensorflow as tf
 import numpy as np
 from PIL import Image
+import copy
 
 
 def get_encodings(location="known", file_name_transform=lambda x: x, num_jitters=1):
@@ -26,8 +27,12 @@ def get_encodings_from_pics(pics, num_jitters=1):
     return [face_recognition.face_encodings(pic, num_jitters=num_jitters)[0] for pic in pics]
 
 
+def get_face_locations(img):
+    return face_recognition.face_locations(np.array(img), model="cnn")
+
+
 def get_face(img):
-    [top, right, bottom, left] = face_recognition.face_locations(np.array(img), model="cnn")[0]
+    [top, right, bottom, left] = get_face_locations(img)[0]
     return img.crop((left, top, right, bottom))
 
 
@@ -102,29 +107,34 @@ def max_training_set_num(X_y_dict):
     return max([len(x) for x in X_y_dict.values()])
 
 
-def get_equal_number_training_set(X_y_dict, max_exist_training_set_num=None, generate_extra_for_each=0):
+def get_equal_number_training_set(X_y_dict, max_exist_training_set_num=None, generate_extra_for_each=0, copy_dict=False):
     if max_exist_training_set_num is None:
         max_exist_training_set_num = max_training_set_num(X_y_dict)
 
+    if copy_dict:
+        dic = copy.deepcopy(X_y_dict)
+    else:
+        dic = X_y_dict
+
     jitter_generator = tf.keras.preprocessing.image \
-        .ImageDataGenerator(width_shift_range=0.2,
-                            height_shift_range=0.2,
-                            zoom_range=0.2,
+        .ImageDataGenerator(width_shift_range=0.1,
+                            height_shift_range=0.1,
+                            zoom_range=0.1,
                             rotation_range=10)
 
-    total_num = len(X_y_dict.keys())
-    for idx, key in enumerate(X_y_dict.keys()):
+    total_num = len(dic.keys())
+    for idx, key in enumerate(dic.keys()):
         generate_list = []
-        photos = X_y_dict[key]
+        photos = dic[key]
         need_to_add_num = max_exist_training_set_num - len(photos) + generate_extra_for_each
         for i in range(need_to_add_num):
             rand_photo = photos[np.random.randint(len(photos))]
             generate_list.append(jitter_generator.random_transform(rand_photo))
-        X_y_dict[key] += generate_list
+        dic[key] += generate_list
 
         if (idx + 1) % 10 == 0 or idx + 1 == total_num:
             print('Group processed {}/{}'.format(idx + 1, total_num))
-    return X_y_dict
+    return dic
 
 
 def get_encoding_for_known_face(imgs_array, rescan=False, num_jitters=0):
@@ -132,9 +142,8 @@ def get_encoding_for_known_face(imgs_array, rescan=False, num_jitters=0):
 
     def process(x, i):
         x_np = np.asarray(x)
-        # print(x_np.shape)
         if rescan:
-            face_locs = None
+            face_locs = get_face_locations(x_np)
         else:
             face_locs = [[0, x_np.shape[1] - 1, x_np.shape[0] - 1, 1]]
 
