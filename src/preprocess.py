@@ -27,12 +27,13 @@ def get_encodings_from_pics(pics, num_jitters=1):
     return [face_recognition.face_encodings(pic, num_jitters=num_jitters)[0] for pic in pics]
 
 
-def get_face_locations(img):
-    return face_recognition.face_locations(np.array(img), model="cnn")
+def get_face_locations(img_arr):
+    # print(img_arr.shape)
+    return face_recognition.face_locations(img_arr, model="cnn")
 
 
 def get_face(img):
-    [top, right, bottom, left] = get_face_locations(img)[0]
+    [top, right, bottom, left] = get_face_locations(np.array(img))[0]
     return img.crop((left, top, right, bottom))
 
 
@@ -115,10 +116,8 @@ def get_equal_number_training_set(X_y_dict, max_exist_training_set_num=None, gen
         dic = X_y_dict
 
     jitter_generator = tf.keras.preprocessing.image \
-        .ImageDataGenerator(width_shift_range=0.1,
-                            height_shift_range=0.1,
-                            zoom_range=0.1,
-                            rotation_range=10)
+        .ImageDataGenerator(rotation_range=20,
+                            channel_shift_range=32)
 
     total_num = len(dic.keys())
     for idx, key in enumerate(dic.keys()):
@@ -127,7 +126,7 @@ def get_equal_number_training_set(X_y_dict, max_exist_training_set_num=None, gen
         need_to_add_num = max_exist_training_set_num - len(photos) + generate_extra_for_each
         for i in range(need_to_add_num):
             rand_photo = photos[np.random.randint(len(photos))]
-            generate_list.append(jitter_generator.random_transform(rand_photo))
+            generate_list.append(jitter_generator.random_transform(rand_photo).astype(np.uint8))
         dic[key] += generate_list
 
         if (idx + 1) % 10 == 0 or idx + 1 == total_num:
@@ -139,12 +138,11 @@ def get_encoding_for_known_face(imgs_array, rescan=False, num_jitters=0):
     total_num = len(imgs_array)
 
     def process(x, i):
-        x_np = np.asarray(x)
+        x_np = np.array(x)
         if rescan:
             face_locs = get_face_locations(x_np)
         else:
-            face_locs = [[0, x_np.shape[1] - 1, x_np.shape[0] - 1, 1]]
-
+            face_locs = [(0, x_np.shape[1] - 1, x_np.shape[0] - 1, 0)]
         found_face = face_recognition.face_encodings(x_np, face_locs, num_jitters=num_jitters)
         if len(found_face) != 1:
             Image.fromarray(x_np).show()
