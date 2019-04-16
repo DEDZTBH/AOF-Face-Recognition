@@ -5,9 +5,9 @@ from src.util import transform_2017_photos, save, load, dict_keys_map_to_numbers
 # from PIL import Image
 
 recover = True
-file_name = 'preprocess_test_num_map_2_100'
+file_name = 'preprocess_test_num_map_2_1'
 generate_extra_for_each = 2
-encoding_jitters = 100
+encoding_jitters = 1
 
 if recover:
     (new_X_num, num_map, new_y_num,
@@ -44,7 +44,7 @@ else:
     # new_X_num = get_encoding_for_known_face(new_X_raw, rescan=True, num_jitters=encoding_jitters)
     # orig_new_X_num = get_encoding_for_known_face(orig_new_X_raw, rescan=True, num_jitters=encoding_jitters)
     new_X_num = get_encoding_for_known_face(new_X_raw, rescan=False, num_jitters=encoding_jitters)
-    orig_new_X_num = get_encoding_for_known_face(orig_new_X_raw, rescan=False, num_jitters=encoding_jitters)
+    orig_new_X_num = get_encoding_for_known_face(orig_new_X_raw, rescan=False, num_jitters=1)
     save((new_X_num, num_map, new_y_num,
           max_t_s_num,
           num_student,

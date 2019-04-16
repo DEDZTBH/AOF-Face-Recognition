@@ -29,7 +29,8 @@ def get_encodings_from_pics(pics, num_jitters=1):
 
 def get_face_locations(img_arr):
     # print(img_arr.shape)
-    return face_recognition.face_locations(img_arr, model="cnn")
+    # return face_recognition.face_locations(img_arr, model="cnn")
+    return face_recognition.face_locations(img_arr)
 
 
 def get_face(img):
@@ -83,6 +84,15 @@ def training_set_to_dict(X, y):
     return X_y_dict
 
 
+def shuffle_training_data(X, y):
+    matrix = np.asmatrix([X, y]).transpose()
+    np.random.shuffle(matrix)
+    matrix = matrix.transpose()
+    X = matrix[0].A1
+    y = matrix[1].A1
+    return X, y
+
+
 def dict_to_training_set(X_y_dict, shuffle_training_set=False):
     X = []
     y = []
@@ -93,11 +103,7 @@ def dict_to_training_set(X_y_dict, shuffle_training_set=False):
             y.append(key)
 
     if shuffle_training_set:
-        matrix = np.asmatrix([X, y]).transpose()
-        np.random.shuffle(matrix)
-        matrix = matrix.transpose()
-        X = matrix[0].A1
-        y = matrix[1].A1
+        X, y = shuffle_training_data(X, y)
 
     return X, y
 
@@ -106,7 +112,8 @@ def max_training_set_num(X_y_dict):
     return max([len(x) for x in X_y_dict.values()])
 
 
-def get_equal_number_training_set(X_y_dict, max_exist_training_set_num=None, generate_extra_for_each=0, copy_dict=False):
+def get_equal_number_training_set(X_y_dict, max_exist_training_set_num=None, generate_extra_for_each=0,
+                                  copy_dict=False):
     if max_exist_training_set_num is None:
         max_exist_training_set_num = max_training_set_num(X_y_dict)
 
@@ -134,7 +141,7 @@ def get_equal_number_training_set(X_y_dict, max_exist_training_set_num=None, gen
     return dic
 
 
-def get_encoding_for_known_face(imgs_array, rescan=False, num_jitters=0):
+def get_encoding_for_known_face(imgs_array, rescan=False, num_jitters=1):
     total_num = len(imgs_array)
 
     def process(x, i):
