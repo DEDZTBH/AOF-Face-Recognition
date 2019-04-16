@@ -7,10 +7,11 @@ from tensorflow.contrib.factorization import KMeans
 from src.preprocess_test_num_map import num_student, new_X_num, new_y_num, num_map, orig_new_X_num, orig_new_y
 
 # Parameters
+from src.util import save
 
-num_steps = 1000
+num_steps = 2000
 batch_size = 128
-k = num_student * 2
+k = num_student
 num_classes = num_student
 num_features = 128
 
@@ -57,7 +58,7 @@ if __name__ == '__main__':
         for i in range(1, num_steps + 1):
             _, d, idx = sess.run([train_op, avg_distance, cluster_idx],
                                  feed_dict={X: full_data_x})
-            if i % 1000 == 0 or i == 1:
+            if i % 100 == 0 or i == 1:
                 print("Step %i, Avg Distance: %f" % (i, d))
 
         # Assign a label to each centroid
@@ -86,3 +87,5 @@ if __name__ == '__main__':
 
         save_path = saver.save(sess, "models/model.ckpt")
         print("Model saved in path: %s" % save_path)
+
+        save(labels_map_np, 'labels_map_np')

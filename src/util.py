@@ -50,3 +50,7 @@ def dict_keys_map_to_numbers(dic, generate_new_dict=True, existing_keys_map=None
                 new_dict[len(dict_num_map)] = dic[key]
             dict_num_map.append(key)
         return new_dict, dict_num_map
+
+
+def decode_num_map(encoded_arr, num_map):
+    return [num_map[i] for i in encoded_arr]
