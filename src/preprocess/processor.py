@@ -4,7 +4,7 @@ from src.preprocess.preprocess import get_face_pics, training_set_to_dict, max_t
 from src.util.util import transform_2017_photos, save, load
 
 recover = True
-generate_extra_for_each = 0
+generate_extra_for_each = 2
 encoding_jitters = 100
 file_name = 'preprocess_test_{}_{}'.format(generate_extra_for_each, encoding_jitters)
 test_jitters = 1

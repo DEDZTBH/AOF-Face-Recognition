@@ -8,7 +8,7 @@ from src.preprocess.processor import get_processed_data
  num_student,
  test_new_X, test_new_y) = get_processed_data()
 
-knn_trained = knn_generate(new_X, new_y, verbose=True)
+knn_trained = knn_generate(new_X, new_y, n_neighbors=max_t_s_num, verbose=True)
 
 unknown_image = face_recognition.load_image_file('data/unknown/51341390_10156668527250236_6458268350773460992_o.jpg')
 # Find all the faces and face encodings in the unknown image
@@ -18,7 +18,7 @@ face_encodings = face_recognition.face_encodings(unknown_image, face_locations)
 pil_image = Image.fromarray(unknown_image)
 
 predictions = predict(face_encodings, knn_trained,
-                      distance_threshold=0.54,
-                      n_neighbors=3)
+                      distance_threshold=0.52,
+                      n_neighbors=max_t_s_num)
 
 show_prediction_labels_on_image(pil_image, face_locations, predictions)

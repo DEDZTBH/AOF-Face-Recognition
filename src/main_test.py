@@ -1,3 +1,4 @@
+import time
 import face_recognition
 from PIL import Image, ImageDraw, ImageFont
 import pickle
@@ -43,6 +44,8 @@ def predict(filename, tolerance, known_face_encodings, known_face_names, showimg
         draw = ImageDraw.Draw(pil_image)
 
         # Loop through each face found in the unknown image
+        start = time.time()
+        do_test = True
         for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
             # See if the face is a match for the known face(s)
             face_dis = face_recognition.face_distance(known_face_encodings, face_encoding)
@@ -61,15 +64,18 @@ def predict(filename, tolerance, known_face_encodings, known_face_names, showimg
                 name = known_face_names[best_match_index]
 
             # Draw a box around the face using the Pillow module
-            draw.rectangle(((left, top), (right, bottom)), outline=(0, 0, 255))
+            if not do_test:
+                draw.rectangle(((left, top), (right, bottom)), outline=(0, 0, 255))
 
             # Draw a label with a name below the face
             # text_width, text_height = draw.textsize(name)
             # draw.rectangle(((left, bottom - text_height - 10), (right, bottom)), fill=(0, 0, 255), outline=(0, 0, 255))
+            if not do_test:
+                draw.text((left + 6, bottom + np.random.randint(0, 20)), name +
+                          '({:.1f}%)'.format(face_distance_to_conf(face_dis.min(), tolerance) * 100),
+                          fill=(0, 210, 0, 255), font=font)
 
-            draw.text((left + 6, bottom + np.random.randint(0, 20)), name +
-                      '({:.1f}%)'.format(face_distance_to_conf(face_dis.min(), tolerance) * 100),
-                      fill=(0, 210, 0, 255), font=font)
+        print('Made {} predictions in {:.3f}ms'.format(len(face_encodings), (time.time() - start) * 1000))
 
         # Remove the drawing library from memory as per the Pillow docs
         del draw
@@ -84,8 +90,8 @@ predict('data/unknown/51341390_10156668527250236_6458268350773460992_o.jpg',
         known_face_names,
         True)
 
-predict('data/unknown/2019PoetryFinalFour.jpg',
-        0.54,
-        known_face_encodings,
-        known_face_names,
-        True)
+# predict('data/unknown/2019PoetryFinalFour.jpg',
+#         0.54,
+#         known_face_encodings,
+#         known_face_names,
+#         True)
