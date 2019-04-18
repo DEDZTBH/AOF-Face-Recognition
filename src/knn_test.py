@@ -3,7 +3,10 @@ import face_recognition
 from PIL import Image
 from src.preprocess.processor import get_processed_data
 
-(new_X, new_X_raw, new_y, max_t_s_num, num_student) = get_processed_data()
+(new_X, new_X_raw, new_y,
+ max_t_s_num,
+ num_student,
+ test_new_X, test_new_y) = get_processed_data()
 
 knn_trained = knn_generate(new_X, new_y, verbose=True)
 

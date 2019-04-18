@@ -29,8 +29,8 @@ def get_encodings_from_pics(pics, num_jitters=1):
 
 def get_face_locations(img_arr):
     # print(img_arr.shape)
-    return face_recognition.face_locations(img_arr, model="cnn")
-    # return face_recognition.face_locations(img_arr)
+    # return face_recognition.face_locations(img_arr, model="cnn")
+    return face_recognition.face_locations(img_arr)
 
 
 def get_face(img):
@@ -42,7 +42,7 @@ def get_faces(imgs):
     return [get_face(img) for img in imgs]
 
 
-def get_face_pics(location="known", file_name_transform=lambda x: x, face_only=True, resize_to_square=None):
+def get_face_pics(location="data/known", file_name_transform=lambda x: x, face_only=True, resize_to_square=None):
     if resize_to_square is None:
         resize_to_square = face_only
 
@@ -51,7 +51,9 @@ def get_face_pics(location="known", file_name_transform=lambda x: x, face_only=T
     known_names = []
 
     directory = os.fsencode(location)
-    for filename in os.listdir(directory):
+
+    global i
+    for idx, filename in enumerate(os.listdir(directory)):
         p = filename.decode("utf-8")
         name = file_name_transform(p)
         known_names.append(name)
@@ -69,7 +71,11 @@ def get_face_pics(location="known", file_name_transform=lambda x: x, face_only=T
                 # print('Image of {} has size {}x{}, resize to {}'.format(name, width, height, new_width_height))
 
         known_faces.append(np.array(raw_photo_to_add))
+        i = idx + 1
+        if i % 10 == 0:
+            print('Processed {} pictures'.format(i))
 
+    print('Processed {} pictures'.format(i))
     return known_faces, known_names
 
 
