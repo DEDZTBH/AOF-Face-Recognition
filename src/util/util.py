@@ -25,12 +25,12 @@ def transform_2017_photos(filename):
 
 
 def save(stuff, filename, ext='pkl'):
-    with open('{}.{}'.format(filename, ext), 'wb') as file:
+    with open('pkl/{}.{}'.format(filename, ext), 'wb') as file:
         pickle.dump(stuff, file)
 
 
 def load(filename, ext='pkl'):
-    with open('{}.{}'.format(filename, ext), 'rb') as file:
+    with open('pkl/{}.{}'.format(filename, ext), 'rb') as file:
         return pickle.load(file)
 
 

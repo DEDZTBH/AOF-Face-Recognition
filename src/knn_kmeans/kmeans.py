@@ -4,10 +4,15 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.contrib.factorization import KMeans
 
-from src.preprocess_test_num_map import num_student, new_X_num, new_y_num, num_map, orig_new_X_num, orig_new_y
+from src.preprocess.processor_num_map import get_processed_data
 
 # Parameters
-from src.util import save
+from src.util.util import save
+
+(new_X_num, num_map, new_y_num,
+ max_t_s_num,
+ num_student,
+ test_new_X_num, test_new_y) = get_processed_data()
 
 num_steps = 2000
 batch_size = 128
@@ -52,7 +57,7 @@ if __name__ == '__main__':
         sess.run(init_op, feed_dict={X: full_data_x})
 
         one_hot_y = sess.run(tf.one_hot(new_y_num, num_student))
-        orig_one_hot_y = sess.run(tf.one_hot(orig_new_y, num_student))
+        test_one_hot_y = sess.run(tf.one_hot(test_new_y, num_student))
 
         # Training
         for i in range(1, num_steps + 1):
@@ -82,7 +87,7 @@ if __name__ == '__main__':
         accuracy_op = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
         # Test Model
-        test_x, test_y = orig_new_X_num, orig_one_hot_y
+        test_x, test_y = test_new_X_num, test_one_hot_y
         print("Test Accuracy:", sess.run(accuracy_op, feed_dict={X: test_x, y: test_y}))
 
         save_path = saver.save(sess, "models/model.ckpt")

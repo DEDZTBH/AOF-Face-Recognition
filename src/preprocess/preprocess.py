@@ -6,7 +6,7 @@ from PIL import Image
 import copy
 
 
-def get_encodings(location="known", file_name_transform=lambda x: x, num_jitters=1):
+def get_encodings(location="data/known", file_name_transform=lambda x: x, num_jitters=1):
     # Create arrays of known face encodings and their names
     known_face_encodings = []
     known_face_names = []
@@ -29,8 +29,8 @@ def get_encodings_from_pics(pics, num_jitters=1):
 
 def get_face_locations(img_arr):
     # print(img_arr.shape)
-    # return face_recognition.face_locations(img_arr, model="cnn")
-    return face_recognition.face_locations(img_arr)
+    return face_recognition.face_locations(img_arr, model="cnn")
+    # return face_recognition.face_locations(img_arr)
 
 
 def get_face(img):

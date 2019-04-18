@@ -1,22 +1,23 @@
 import face_recognition
 from PIL import Image, ImageDraw, ImageFont
 import pickle
-from src.preprocess import get_encodings
-from src.util import face_distance_to_conf, transform_2017_photos
+from src.preprocess.preprocess import get_encodings
+from src.util.util import face_distance_to_conf, transform_2017_photos
 import numpy as np
 
 font = ImageFont.truetype('fonts/Arial Bold.ttf', 12)
 
 recover = True
 if recover:
-    with open('saved.pkl', 'rb') as file:
+    with open('pkl/saved.pkl', 'rb') as file:
         saved = pickle.load(file)
         (known_face_encodings, known_face_names) = saved
 else:
-    known_face_encodings, known_face_names = get_encodings('2017 photos', file_name_transform=transform_2017_photos,
+    known_face_encodings, known_face_names = get_encodings('data/2017 photos',
+                                                           file_name_transform=transform_2017_photos,
                                                            num_jitters=100)
     # known_face_encodings, known_face_names = get_encodings(num_jitters=100)
-    with open('saved.pkl', 'wb') as file:
+    with open('pkl/saved.pkl', 'wb') as file:
         pickle.dump((known_face_encodings, known_face_names), file)
 
 
@@ -77,13 +78,13 @@ def predict(filename, tolerance, known_face_encodings, known_face_names, showimg
         pil_image.show()
 
 
-predict('unknown/51341390_10156668527250236_6458268350773460992_o.jpg',
+predict('data/unknown/51341390_10156668527250236_6458268350773460992_o.jpg',
         0.54,
         known_face_encodings,
         known_face_names,
         True)
 
-predict('unknown/2019PoetryFinalFour.jpg',
+predict('data/unknown/2019PoetryFinalFour.jpg',
         0.54,
         known_face_encodings,
         known_face_names,
