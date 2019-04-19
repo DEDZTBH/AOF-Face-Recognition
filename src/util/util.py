@@ -1,6 +1,7 @@
 import math
 import re
 import pickle
+import numpy as np
 
 
 def face_distance_to_conf(face_distance, face_match_threshold):
@@ -54,3 +55,7 @@ def dict_keys_map_to_numbers(dic, generate_new_dict=True, existing_keys_map=None
 
 def decode_num_map(encoded_arr, num_map):
     return [num_map[i] for i in encoded_arr]
+
+
+def random_rows(A, num_rows):
+    return A[np.random.choice(A.shape[0], num_rows, replace=False), :]
