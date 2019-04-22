@@ -162,8 +162,6 @@ fabric.properties
 *.jpg
 *.jpeg
 *.png
-data/2017 photos
-data/known
-data/unknown
+data
 .idea
 models

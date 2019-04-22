@@ -118,6 +118,14 @@ def max_training_set_num(X_y_dict):
     return max([len(x) for x in X_y_dict.values()])
 
 
+jitter_generator = tf.keras.preprocessing.image.ImageDataGenerator(rotation_range=20,
+                                                                   channel_shift_range=32)
+
+
+def generate_gitter_image(rand_photo):
+    return jitter_generator.random_transform(rand_photo).astype(np.uint8)
+
+
 def get_equal_number_training_set(X_y_dict, max_exist_training_set_num=None, generate_extra_for_each=0,
                                   copy_dict=False):
     if max_exist_training_set_num is None:
@@ -128,18 +136,14 @@ def get_equal_number_training_set(X_y_dict, max_exist_training_set_num=None, gen
     else:
         dic = X_y_dict
 
-    jitter_generator = tf.keras.preprocessing.image \
-        .ImageDataGenerator(rotation_range=20,
-                            channel_shift_range=32)
-
     total_num = len(dic.keys())
     for idx, key in enumerate(dic.keys()):
         generate_list = []
         photos = dic[key]
         need_to_add_num = max_exist_training_set_num - len(photos) + generate_extra_for_each
-        for i in range(need_to_add_num):
+        for _ in range(need_to_add_num):
             rand_photo = photos[np.random.randint(len(photos))]
-            generate_list.append(jitter_generator.random_transform(rand_photo).astype(np.uint8))
+            generate_list.append(generate_gitter_image(rand_photo))
         dic[key] += generate_list
 
         if (idx + 1) % 10 == 0 or idx + 1 == total_num:
