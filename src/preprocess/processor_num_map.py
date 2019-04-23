@@ -1,37 +1,22 @@
 from src.preprocess.preprocess import training_set_to_dict, dict_to_training_set, shuffle_training_data
-from src.util.util import save, load, dict_keys_map_to_numbers
+from src.util.util import dict_keys_map_to_numbers, load_or_create
 import src.preprocess.processor as raw_processor
 import copy
 
-recover = None
 generate_extra_for_each = 0
 encoding_jitters = 100
 neq = False
 orig_jitters = 1
+file_name = None
 
 
-def get_processed_data(recover=recover, generate_extra_for_each=generate_extra_for_each,
+def get_processed_data(generate_extra_for_each=generate_extra_for_each,
                        encoding_jitters=encoding_jitters, orig_jitters=orig_jitters, neq=neq):
-    file_name = 'preprocess_test_num_map_{}_{}{}'.format(generate_extra_for_each, encoding_jitters,
-                                                         '_neq' if neq else '')
-    magic_obj = None
-
-    if recover is None:
-        try:
-            magic_obj = load(file_name)
-            recover = True
-        except FileNotFoundError:
-            recover = False
-
-    if recover:
-        if magic_obj is None:
-            magic_obj = load(file_name)
-    else:
+    def _get_processed_data():
         (new_X, new_X_raw, new_y,
          max_t_s_num,
          num_student,
          orig_new_X, orig_new_y) = raw_processor.get_processed_data(
-            recover=None,
             generate_extra_for_each=generate_extra_for_each,
             encoding_jitters=encoding_jitters,
             neq=neq,
@@ -56,14 +41,22 @@ def get_processed_data(recover=recover, generate_extra_for_each=generate_extra_f
         # for i in new_X_raw:
         #     Image.fromarray(i).show()
 
-        magic_obj = (new_X_num, num_map, new_y_num,
-                     max_t_s_num,
-                     num_student,
-                     orig_new_X_num, orig_new_y)
+        return (new_X_num, num_map, new_y_num,
+                max_t_s_num,
+                num_student,
+                orig_new_X_num, orig_new_y)
 
-        save(magic_obj, file_name)
+    global file_name
+    file_name = 'preprocess_test_num_map_{}_{}{}'.format(generate_extra_for_each, encoding_jitters,
+                                                         '_neq' if neq else '')
+
+    magic_obj = load_or_create(file_name, create_fn=_get_processed_data)
 
     return magic_obj
+
+
+def get_file_name():
+    return file_name
 
 
 if __name__ == '__main__':

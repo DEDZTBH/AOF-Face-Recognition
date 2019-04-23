@@ -1,13 +1,14 @@
-import face_recognition
+from os import path
+
 import tensorflow as tf
-from PIL import Image
 
 from src.knn_kmeans.kmeans import num_features, run_k_means
-from src.knn import knn_generate, predict, show_prediction_labels_on_image
-from src.preprocess.processor_num_map import get_processed_data
-from src.util.util import load, decode_num_map
+from src.knn import knn_generate, predict
+from src.preprocess.processor_num_map import get_processed_data, get_file_name
+from src.test_data import test_data
+from src.util.util import load, decode_num_map, load_or_create
 
-keep_session = True
+restore = False
 
 (new_X_num, num_map, new_y_num,
  max_t_s_num,
@@ -17,41 +18,37 @@ keep_session = True
 n = round(max_t_s_num / 2)
 print('Using n of {}'.format(n))
 
-k, num_classes, sess = run_k_means(keep_session=keep_session)
-
-if keep_session:
-    clusters = [v for v in tf.trainable_variables() if v.name == 'clusters:0'][0]
-else:
+if restore:
     # Variable = tf.get_variable("Variable", shape=[k], dtype='int64')
+    labels_num, k = load('labels_map_np,k', folder=path.join('pkl', 'kmeans'))
     clusters = tf.get_variable("clusters", shape=[k, num_features])
     saver = tf.train.Saver()
-
     sess = tf.Session()
     sess.run(tf.global_variables_initializer())
-    saver.restore(sess, "models/model.ckpt")
+    saver.restore(sess, "tf_models/model.ckpt")
     print("model restored")
-    # Variable_np = Variable.eval(sess)
-
+else:
+    k, num_classes, labels_num, sess = run_k_means(keep_session=True)
+    clusters = [v for v in tf.trainable_variables() if v.name == 'clusters:0'][0]
 clusters_np = clusters.eval(sess)
+# Variable_np = Variable.eval(sess)
 sess.close()
-
-labels_num = load('labels_map_np')
 
 labels = decode_num_map(labels_num, num_map)
 
-knn_trained = knn_generate(clusters_np, labels, n_neighbors=n, verbose=True)
+n = round(max_t_s_num / 2)
+print('Using n of {}'.format(n))
 
-# predict([known_face_encodings[0]], knn_trained)
+extra = '1719_{}'.format(get_file_name())
 
-unknown_image = face_recognition.load_image_file('data/unknown/51341390_10156668527250236_6458268350773460992_o.jpg')
-# Find all the faces and face encodings in the unknown image
-face_locations = face_recognition.face_locations(unknown_image)
-face_encodings = face_recognition.face_encodings(unknown_image, face_locations)
+knn_trained = load_or_create('knn_{}_{}'.format(extra, n),
+                             create_fn=lambda: knn_generate(clusters_np, labels, n_neighbors=n, verbose=True),
+                             folder=path.join('pkl', 'knn'))
 
-pil_image = Image.fromarray(unknown_image)
-
-predictions = predict(face_encodings, knn_trained,
-                      distance_threshold=0.52,
-                      n_neighbors=n)
-
-show_prediction_labels_on_image(pil_image, face_locations, predictions)
+test_data.test(
+    predict_fn=
+    lambda face_encodings: predict(face_encodings, knn_trained,
+                                   distance_threshold=0.52,
+                                   n_neighbors=n),
+    show_image=False
+)

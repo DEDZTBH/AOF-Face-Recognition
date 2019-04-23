@@ -1,7 +1,9 @@
-from src.knn import knn_generate, predict, show_prediction_labels_on_image
-import face_recognition
-from PIL import Image
-from src.preprocess.processor import get_processed_data
+from src.knn import knn_generate, predict
+from src.preprocess.processor import get_processed_data, get_file_name
+from os import path
+
+from src.test_data import test_data
+from src.util.util import load_or_create
 
 (new_X, new_X_raw, new_y,
  max_t_s_num,
@@ -11,17 +13,16 @@ from src.preprocess.processor import get_processed_data
 n = round(max_t_s_num / 2)
 print('Using n of {}'.format(n))
 
-knn_trained = knn_generate(new_X, new_y, n_neighbors=n, verbose=True)
+extra = '1719_{}'.format(get_file_name())
 
-unknown_image = face_recognition.load_image_file('data/unknown/51341390_10156668527250236_6458268350773460992_o.jpg')
-# Find all the faces and face encodings in the unknown image
-face_locations = face_recognition.face_locations(unknown_image)
-face_encodings = face_recognition.face_encodings(unknown_image, face_locations)
+knn_trained = load_or_create('knn_{}_{}'.format(extra, n),
+                             create_fn=lambda: knn_generate(new_X, new_y, n_neighbors=n, verbose=True),
+                             folder=path.join('pkl', 'knn'))
 
-pil_image = Image.fromarray(unknown_image)
-
-predictions = predict(face_encodings, knn_trained,
-                      distance_threshold=0.52,
-                      n_neighbors=n)
-
-show_prediction_labels_on_image(pil_image, face_locations, predictions)
+test_data.test(
+    predict_fn=
+    lambda face_encodings: predict(face_encodings, knn_trained,
+                                   distance_threshold=0.52,
+                                   n_neighbors=n),
+    show_image=True
+)

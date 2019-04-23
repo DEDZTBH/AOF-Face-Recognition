@@ -2,6 +2,7 @@ import math
 import re
 import pickle
 import numpy as np
+from os import path
 
 
 def face_distance_to_conf(face_distance, face_match_threshold):
@@ -25,14 +26,31 @@ def transform_2017_photos(filename):
     return p
 
 
-def save(stuff, filename, ext='pkl'):
-    with open('pkl/{}.{}'.format(filename, ext), 'wb') as file:
+def save(stuff, filename, ext='pkl', folder='pkl'):
+    with open(path.join(folder, '{}.{}'.format(filename, ext)), 'wb') as file:
         pickle.dump(stuff, file)
 
 
-def load(filename, ext='pkl'):
-    with open('pkl/{}.{}'.format(filename, ext), 'rb') as file:
+def load(filename, ext='pkl', folder='pkl'):
+    with open(path.join(folder, '{}.{}'.format(filename, ext)), 'rb') as file:
         return pickle.load(file)
+
+
+def load_or_create(filename, ext='pkl', create_fn=None, folder='pkl', with_status=False):
+    try:
+        magic_obj = load(filename, ext, folder)
+        status = True
+    except FileNotFoundError:
+        status = False
+        if create_fn is None:
+            magic_obj = None
+        else:
+            magic_obj = create_fn()
+            save(magic_obj, filename, ext, folder)
+    if with_status:
+        return status, magic_obj
+    else:
+        return magic_obj
 
 
 def dict_keys_map_to_numbers(dic, generate_new_dict=True, existing_keys_map=None):

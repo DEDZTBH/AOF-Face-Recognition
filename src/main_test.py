@@ -84,13 +84,13 @@ def predict(filename, tolerance, known_face_encodings, known_face_names, showimg
         pil_image.show()
 
 
-predict('data/unknown/51341390_10156668527250236_6458268350773460992_o.jpg',
+predict('data/unknown/1.jpg',
         0.54,
         known_face_encodings,
         known_face_names,
         True)
 
-# predict('data/unknown/2019PoetryFinalFour.jpg',
+# predict('data/unknown/2.jpg',
 #         0.54,
 #         known_face_encodings,
 #         known_face_names,

@@ -1,5 +1,7 @@
 from __future__ import print_function
 
+from os import path
+
 import numpy as np
 import tensorflow as tf
 from tensorflow.contrib.factorization import KMeans
@@ -27,7 +29,7 @@ def run_k_means(
      orig_new_X_num, orig_new_y) = get_processed_data()
 
     if k is None:
-        k = round(num_student * 1.35914091423)
+        k = num_student
         print('Choosing {} clusters for {} students, {} samples'.format(k, num_student, len(new_y_num)))
 
     if num_classes is None:
@@ -102,15 +104,15 @@ def run_k_means(
     test_x, test_y = orig_new_X_num, test_one_hot_y
     print("Test Accuracy:", sess.run(accuracy_op, feed_dict={X: test_x, y: test_y}))
 
-    save_path = saver.save(sess, "models/model.ckpt")
+    save_path = saver.save(sess, "tf_models/model.ckpt")
     print("Model saved in path: %s" % save_path)
 
-    save(labels_map_np, 'labels_map_np')
+    save((labels_map_np, k), 'labels_map_np,k', folder=path.join('pkl', 'kmeans'))
 
     if not keep_session:
         sess.close()
 
-    return k, num_classes, sess
+    return k, num_classes, labels_map_np, sess
 
 
 if __name__ == '__main__':
