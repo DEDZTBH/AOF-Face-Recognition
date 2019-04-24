@@ -10,7 +10,7 @@ import time
 frame_scale = 0.25
 knn_pkl_name = 'knn_1719_preprocess_test_0_100_2'
 webcam = 0
-skip_frame = False
+skip_frame = True
 confirm_frames = 10
 
 confirm_frames = int(confirm_frames / (2 if skip_frame else 1))
@@ -56,12 +56,12 @@ while True:
     # Only process every other frame of video to save time
     if process_this_frame:
         # Find all the faces and face encodings in the current frame of video
-        face_locations = face_recognition.face_locations(rgb_small_frame, number_of_times_to_upsample=0)
+        face_locations = face_recognition.face_locations(rgb_small_frame)
         face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
         face_names = predict(face_encodings,
                              knn_model,
-                             distance_threshold=0.52,
+                             distance_threshold=0.46,
                              n_neighbors=2,
                              print_time=False)
 
