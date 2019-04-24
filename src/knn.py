@@ -24,8 +24,9 @@ def knn_generate(X, y, n_neighbors=None, knn_algo='ball_tree', verbose=False):
     return knn_clf
 
 
-def predict(X_encodings, knn_clf, distance_threshold=0.6, n_neighbors=1):
-    start = time.time()
+def predict(X_encodings, knn_clf, distance_threshold=0.6, n_neighbors=1, print_time=True):
+    if print_time:
+        start = time.time()
     # if knn_clf is None:
     #     raise Exception("Must supply knn classifier")
 
@@ -39,7 +40,8 @@ def predict(X_encodings, knn_clf, distance_threshold=0.6, n_neighbors=1):
     closest_distances = knn_clf.kneighbors(X_encodings, n_neighbors=n_neighbors)
     are_matches = [closest_distances[0][i][0] <= distance_threshold for i in range(lenX)]
 
-    print('Made {} predictions in {:.3f}ms'.format(lenX, (time.time() - start) * 1000))
+    if print_time:
+        print('Made {} predictions in {:.3f}ms'.format(lenX, (time.time() - start) * 1000))
 
     # Predict classes and remove classifications that aren't within the threshold
     return [pred if rec else "Unknown" for pred, rec in
