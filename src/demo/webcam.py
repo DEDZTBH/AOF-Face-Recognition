@@ -5,10 +5,9 @@ import cv2
 
 from src.knn import predict
 from src.util.util import load
-import time
 
-frame_scale = 0.25
-knn_pkl_name = 'knn_1719_preprocess_test_0_100_2'
+frame_scale = 0.5
+knn_pkl_name = 'knn_1719_preprocess_test_0_100_neq_2'
 webcam = 0
 skip_frame = True
 confirm_frames = 10
@@ -43,11 +42,44 @@ def confirm_op(names):
             confirming[k] = 0
 
 
+# def average_frames(frames):
+#     (rAvg, gAvg, bAvg) = (None, None, None)
+#     total = 0
+#     for frame in frames:
+#         (B, G, R) = cv2.split(frame.astype("float"))
+#         # if the frame averages are None, initialize them
+#         if rAvg is None:
+#             rAvg = R
+#             bAvg = B
+#             gAvg = G
+#
+#         # otherwise, compute the weighted average between the history of
+#         # frames and the current frames
+#         else:
+#             rAvg = ((total * rAvg) + (1 * R)) / (total + 1.0)
+#             gAvg = ((total * gAvg) + (1 * G)) / (total + 1.0)
+#             bAvg = ((total * bAvg) + (1 * B)) / (total + 1.0)
+#
+#         # increment the total number of frames read thus far
+#         total += 1
+#     avg = cv2.merge([bAvg, gAvg, rAvg]).astype("uint8")
+#     return avg
+
+
+# prev_frame = None
+
 while True:
     # Grab a single frame of video
     ret, frame = video_capture.read()
-    start = time.time()
-    # Resize frame of video to 1/4 size for faster face recognition processing
+
+    # if prev_frame is None:
+    #     prev_frame = frame
+    # else:
+    #     frame = average_frames([prev_frame, frame])
+    #     prev_frame = None
+
+    # start = time.time()
+    # Resize frame of video to xxx size for faster face recognition processing
     small_frame = cv2.resize(frame, (0, 0), fx=frame_scale, fy=frame_scale)
 
     # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
@@ -69,12 +101,9 @@ while True:
         # print(confirming)
         # print(confirmed)
 
-    if skip_frame:
-        process_this_frame = not process_this_frame
-
     # Display the results
     for (top, right, bottom, left), name in zip(face_locations, face_names):
-        # Scale back up face locations since the frame we detected in was scaled
+        # Scale back up face locations since the frame we detected in was scaled to xxx
         top = round(top / frame_scale)
         right = round(right / frame_scale)
         bottom = round(bottom / frame_scale)
@@ -95,11 +124,14 @@ while True:
     # Display the resulting image
     cv2.imshow('Video', frame)
 
+    if skip_frame:
+        process_this_frame = not process_this_frame
+
     # Hit 'q' on the keyboard to quit!
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-    print('Frame takes {:2f}ms'.format((time.time() - start) * 1000))
+    # print('Frame takes {:2f}ms'.format((time.time() - start) * 1000))
 
 # Release handle to the webcam
 video_capture.release()
