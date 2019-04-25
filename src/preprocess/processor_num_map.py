@@ -3,9 +3,10 @@ from src.util.util import dict_keys_map_to_numbers, load_or_create
 import src.preprocess.processor as raw_processor
 import copy
 
-generate_extra_for_each = 0
-encoding_jitters = 100
 neq = False
+generate_extra_for_each = 0 \
+    if not neq else 0
+encoding_jitters = 100
 orig_jitters = 1
 file_name = None
 

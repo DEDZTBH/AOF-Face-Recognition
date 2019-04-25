@@ -118,7 +118,7 @@ def max_training_set_num(X_y_dict):
     return max([len(x) for x in X_y_dict.values()])
 
 
-jitter_generator = tf.keras.preprocessing.image.ImageDataGenerator(rotation_range=20,
+jitter_generator = tf.keras.preprocessing.image.ImageDataGenerator(rotation_range=10,
                                                                    channel_shift_range=32)
 
 

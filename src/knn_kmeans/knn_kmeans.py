@@ -8,14 +8,14 @@ from src.preprocess.processor_num_map import get_processed_data, get_file_name
 from src.test_data import test_data
 from src.util.util import load, decode_num_map, load_or_create
 
-restore = False
+restore = True
 
 (new_X_num, num_map, new_y_num,
  max_t_s_num,
  num_student,
  test_new_X_num, test_new_y) = get_processed_data()
 
-n = round(max_t_s_num / 2)
+n = 2
 print('Using n of {}'.format(n))
 
 if restore:
@@ -36,9 +36,6 @@ sess.close()
 
 labels = decode_num_map(labels_num, num_map)
 
-n = round(max_t_s_num / 2)
-print('Using n of {}'.format(n))
-
 extra = '1719_{}'.format(get_file_name())
 
 knn_trained = load_or_create('knn_{}_{}'.format(extra, n),
@@ -48,7 +45,7 @@ knn_trained = load_or_create('knn_{}_{}'.format(extra, n),
 test_data.test(
     predict_fn=
     lambda face_encodings: predict(face_encodings, knn_trained,
-                                   distance_threshold=0.52,
+                                   distance_threshold=0.44,
                                    n_neighbors=n),
     show_image=False
 )

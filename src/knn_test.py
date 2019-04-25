@@ -10,7 +10,7 @@ from src.util.util import load_or_create
  num_student,
  test_new_X, test_new_y) = get_processed_data()
 
-n = round(max_t_s_num / 2)
+n = round(max_t_s_num * 0.8)
 print('Using n of {}'.format(n))
 
 extra = '1719_{}'.format(get_file_name())
@@ -22,7 +22,7 @@ knn_trained = load_or_create('knn_{}_{}'.format(extra, n),
 test_data.test(
     predict_fn=
     lambda face_encodings: predict(face_encodings, knn_trained,
-                                   distance_threshold=0.52,
+                                   distance_threshold=0.42,
                                    n_neighbors=n),
-    show_image=True
+    show_image=False
 )
