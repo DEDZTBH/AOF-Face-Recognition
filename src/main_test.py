@@ -1,97 +1,64 @@
 import time
 import face_recognition
-from PIL import Image, ImageDraw, ImageFont
-import pickle
-from src.preprocess.preprocess import get_encodings
-from src.util.util import face_distance_to_conf, transform_2017_photos
+
+from src.preprocess.preprocess import training_set_to_dict, dict_to_training_set
+from src.preprocess.processor import get_processed_data
 import numpy as np
 
-font = ImageFont.truetype('fonts/Arial Bold.ttf', 12)
+from src.test_data import test_data
+from src.test_data.test_data import results_accuracy
 
-recover = True
-if recover:
-    with open('pkl/saved.pkl', 'rb') as file:
-        saved = pickle.load(file)
-        (known_face_encodings, known_face_names) = saved
-else:
-    known_face_encodings, known_face_names = get_encodings('data/2017 photos',
-                                                           file_name_transform=transform_2017_photos,
-                                                           num_jitters=100)
-    # known_face_encodings, known_face_names = get_encodings(num_jitters=100)
-    with open('pkl/saved.pkl', 'wb') as file:
-        pickle.dump((known_face_encodings, known_face_names), file)
+(new_X, new_X_raw, new_y,
+ max_t_s_num,
+ num_student,
+ test_new_X, test_new_y) = get_processed_data()
+
+# Averaging one person's all pictures to one
+# If not using it, this is the same as using KNN with n=1 (I think)
+print('Use averaging')
+X_y_dict = training_set_to_dict(new_X, new_y)
+for k in X_y_dict:
+    X_y_dict[k] = [np.mean(X_y_dict[k], axis=0)]
+new_X, new_y = dict_to_training_set(X_y_dict)
 
 
-def predict(filename, tolerance, known_face_encodings, known_face_names, showimg):
-    # Initialize some variables
-    # face_locations = []
-    # face_encodings = []
-    # face_names = []
-    # process_this_frame = True
+def predict(face_encodings, tolerance=0.54, print_time=False):
+    start = time.time()
 
-    # Load an image with an unknown face
-    unknown_image = face_recognition.load_image_file(filename)
+    def predict_single(face_encoding):
+        # See if the face is a match for the known face(s)
+        face_dis = face_recognition.face_distance(new_X, face_encoding)
 
-    # Find all the faces and face encodings in the unknown image
-    face_locations = face_recognition.face_locations(unknown_image)
-    face_encodings = face_recognition.face_encodings(unknown_image, face_locations)
+        name = 'Unknown'
 
-    if showimg:
-        # Convert the image to a PIL-format image so that we can draw on top of it with the Pillow library
-        # See http://pillow.readthedocs.io/ for more about PIL/Pillow
-        pil_image = Image.fromarray(unknown_image)
-        # Create a Pillow ImageDraw Draw instance to draw with
-        draw = ImageDraw.Draw(pil_image)
+        # matches = list(face_dis <= tolerance)
+        #
+        # # If a match was found in known_face_encodings, just use the first one.
+        # if True in matches:
+        #     first_match_index = matches.index(True)
+        #     name = known_face_names[first_match_index]
 
-        # Loop through each face found in the unknown image
-        start = time.time()
-        do_test = True
-        for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
-            # See if the face is a match for the known face(s)
-            face_dis = face_recognition.face_distance(known_face_encodings, face_encoding)
+        best_match_index = np.argmin(face_dis)
+        if face_dis[best_match_index] <= tolerance:
+            name = new_y[best_match_index]
+        return name
 
-            name = 'Unknown'
-
-            # matches = list(face_dis <= tolerance)
-            #
-            # # If a match was found in known_face_encodings, just use the first one.
-            # if True in matches:
-            #     first_match_index = matches.index(True)
-            #     name = known_face_names[first_match_index]
-
-            best_match_index = np.argmin(face_dis)
-            if face_dis[best_match_index] <= tolerance:
-                name = known_face_names[best_match_index]
-
-            # Draw a box around the face using the Pillow module
-            if not do_test:
-                draw.rectangle(((left, top), (right, bottom)), outline=(0, 0, 255))
-
-            # Draw a label with a name below the face
-            # text_width, text_height = draw.textsize(name)
-            # draw.rectangle(((left, bottom - text_height - 10), (right, bottom)), fill=(0, 0, 255), outline=(0, 0, 255))
-            if not do_test:
-                draw.text((left + 6, bottom + np.random.randint(0, 20)), name +
-                          '({:.1f}%)'.format(face_distance_to_conf(face_dis.min(), tolerance) * 100),
-                          fill=(0, 210, 0, 255), font=font)
-
+    results = [predict_single(x) for x in face_encodings]
+    if print_time:
         print('Made {} predictions in {:.3f}ms'.format(len(face_encodings), (time.time() - start) * 1000))
 
-        # Remove the drawing library from memory as per the Pillow docs
-        del draw
-
-        # Display the resulting image
-        pil_image.show()
+    return results
 
 
-predict('data/unknown/1.jpg',
-        0.54,
-        known_face_encodings,
-        known_face_names,
-        True)
+accum = 0
 
-# predict('data/unknown/2.jpg',
-#         0.54,
-#         known_face_encodings,
-#         known_face_names,
-#         True)
+for tolerance in np.arange(0.40, 0.61, 0.01):
+    test_result = test_data.test(
+        predict_fn=
+        lambda face_encodings: predict(face_encodings, tolerance=tolerance, print_time=False),
+        show_image=False,
+        print_info=False
+    )
+    accuracy = results_accuracy(test_result)
+    accum += accuracy
+    print("At a tolerance of {:.2f}, accuracy is {:.2f}%".format(tolerance, accuracy * 100))

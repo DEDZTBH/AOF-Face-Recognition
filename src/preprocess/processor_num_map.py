@@ -3,7 +3,7 @@ from src.util.util import dict_keys_map_to_numbers, load_or_create
 import src.preprocess.processor as raw_processor
 import copy
 
-neq = False
+neq = True
 generate_extra_for_each = 0 \
     if not neq else 0
 encoding_jitters = 100
@@ -48,7 +48,7 @@ def get_processed_data(generate_extra_for_each=generate_extra_for_each,
                 orig_new_X_num, orig_new_y)
 
     global file_name
-    file_name = 'preprocess_test_num_map_{}_{}{}'.format(generate_extra_for_each, encoding_jitters,
+    file_name = 'preprocess_num_map_{}_{}{}'.format(generate_extra_for_each, encoding_jitters,
                                                          '_neq' if neq else '')
 
     magic_obj = load_or_create(file_name, create_fn=_get_processed_data)

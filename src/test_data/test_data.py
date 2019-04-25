@@ -21,7 +21,7 @@ def add(file_name, face_locations, face_encodings, face_answers):
     save(test_data, filename=test_data_file_name, folder=test_data_folder_name)
 
 
-def test(predict_fn, show_image=False):
+def test(predict_fn, show_image=False, print_info=True):
     record = []
     for (file_name, face_locations, face_encodings, face_answers) in get():
 
@@ -39,8 +39,18 @@ def test(predict_fn, show_image=False):
                 if predictions[i] == face_answers[i]:
                     correct_count += 1
             record.append((file_name, correct_count, num_face))
-            print('Recognition accuracy on {} is {:.2f}%'.format(file_name, (correct_count / num_face * 100)))
+            if print_info:
+                print('Recognition accuracy on {} is {:.2f}%'.format(file_name, (correct_count / num_face * 100)))
     return record
+
+
+def results_accuracy(results):
+    correct = 0
+    total = 0
+    for result in results:
+        correct += result[1]
+        total += result[2]
+    return correct / total
 
 
 analyze_file_name = '2.jpg'

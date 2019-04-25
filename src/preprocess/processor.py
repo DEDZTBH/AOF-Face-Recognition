@@ -50,7 +50,7 @@ def get_processed_data(generate_extra_for_each=generate_extra_for_each,
                 orig_new_X, orig_new_y)
 
     global file_name
-    file_name = 'preprocess_test_{}_{}{}{}'.format(generate_extra_for_each, encoding_jitters, '_neq' if neq else '', '_aug' if aug else '')
+    file_name = 'preprocess_{}_{}{}{}'.format(generate_extra_for_each, encoding_jitters, '_neq' if neq else '', '_aug' if aug else '')
 
     magic_obj = load_or_create(file_name, create_fn=_get_processed_data)
 
