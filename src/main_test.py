@@ -13,13 +13,14 @@ from src.test_data.test_data import results_accuracy
  num_student,
  test_new_X, test_new_y) = get_processed_data()
 
+
 # Averaging one person's all pictures to one
 # If not using it, this is the same as using KNN with n=1 (I think)
-print('Use averaging')
-X_y_dict = training_set_to_dict(new_X, new_y)
-for k in X_y_dict:
-    X_y_dict[k] = [np.mean(X_y_dict[k], axis=0)]
-new_X, new_y = dict_to_training_set(X_y_dict)
+# print('Use averaging')
+# X_y_dict = training_set_to_dict(new_X, new_y)
+# for k in X_y_dict:
+#     X_y_dict[k] = [np.mean(X_y_dict[k], axis=0)]
+# new_X, new_y = dict_to_training_set(X_y_dict)
 
 
 def predict(face_encodings, tolerance=0.54, print_time=False):
@@ -50,8 +51,7 @@ def predict(face_encodings, tolerance=0.54, print_time=False):
     return results
 
 
-accum = 0
-
+start = time.time()
 for tolerance in np.arange(0.40, 0.61, 0.01):
     test_result = test_data.test(
         predict_fn=
@@ -60,5 +60,5 @@ for tolerance in np.arange(0.40, 0.61, 0.01):
         print_info=False
     )
     accuracy = results_accuracy(test_result)
-    accum += accuracy
     print("At a tolerance of {:.2f}, accuracy is {:.2f}%".format(tolerance, accuracy * 100))
+print("Test finished in {:.3f}ms".format((time.time() - start) * 1000))

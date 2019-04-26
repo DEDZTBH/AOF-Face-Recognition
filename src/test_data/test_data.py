@@ -21,6 +21,12 @@ def add(file_name, face_locations, face_encodings, face_answers):
     save(test_data, filename=test_data_file_name, folder=test_data_folder_name)
 
 
+def delete(file_name):
+    test_data = get()
+    test_data = [data for data in test_data if data[0] != file_name]
+    save(test_data, filename=test_data_file_name, folder=test_data_folder_name)
+
+
 def test(predict_fn, show_image=False, print_info=True):
     record = []
     for (file_name, face_locations, face_encodings, face_answers) in get():
@@ -53,14 +59,15 @@ def results_accuracy(results):
     return correct / total
 
 
-analyze_file_name = '2.jpg'
+analyze_file_name = '3.jpg'
 
 
-def init(analyze_file_name=analyze_file_name):
+def init(analyze_file_name=analyze_file_name, number_of_times_to_upsample=1):
     unknown_image = face_recognition.load_image_file(path.join('data', 'unknown', analyze_file_name))
 
     # Find all the faces and face encodings in the unknown image
-    face_locations = face_recognition.face_locations(unknown_image)
+    face_locations = face_recognition.face_locations(unknown_image,
+                                                     number_of_times_to_upsample=number_of_times_to_upsample)
     face_encodings = face_recognition.face_encodings(unknown_image, face_locations)
 
     return unknown_image, face_locations, face_encodings

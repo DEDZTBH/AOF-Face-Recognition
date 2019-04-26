@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 
 from src.knn import knn_generate, predict
@@ -13,7 +15,7 @@ from src.util.util import load_or_create
  num_student,
  test_new_X, test_new_y) = get_processed_data()
 
-n = round(max_t_s_num * 1)
+n = round(max_t_s_num * 0.5)
 print('Using n of {}'.format(n))
 
 extra = '1719_{}'.format(get_file_name())
@@ -30,8 +32,7 @@ knn_trained = load_or_create('knn_{}_{}'.format(extra, n),
 #     show_image=False
 # )
 
-accum = 0
-
+start = time.time()
 for tolerance in np.arange(0.40, 0.61, 0.01):
     test_result = test_data.test(
         predict_fn=
@@ -42,5 +43,5 @@ for tolerance in np.arange(0.40, 0.61, 0.01):
         print_info=False
     )
     accuracy = results_accuracy(test_result)
-    accum += accuracy
     print("At a tolerance of {:.2f}, accuracy is {:.2f}%".format(tolerance, accuracy * 100))
+print("Test finished in {:.3f}ms".format((time.time() - start) * 1000))

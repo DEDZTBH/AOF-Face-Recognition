@@ -1,3 +1,4 @@
+import time
 from os import path
 
 import tensorflow as tf
@@ -17,7 +18,7 @@ restore = False
  num_student,
  test_new_X_num, test_new_y) = get_processed_data()
 
-n = 2
+n = 1
 print('Using n of {}'.format(n))
 
 if restore:
@@ -52,7 +53,7 @@ knn_trained = load_or_create('knn_{}_{}'.format(extra, n),
 #     show_image=False
 # )
 
-accum = 0
+start = time.time()
 for tolerance in np.arange(0.40, 0.61, 0.01):
     test_result = test_data.test(
         predict_fn=
@@ -63,5 +64,5 @@ for tolerance in np.arange(0.40, 0.61, 0.01):
         print_info=False
     )
     accuracy = results_accuracy(test_result)
-    accum += accuracy
     print("At a tolerance of {:.2f}, accuracy is {:.2f}%".format(tolerance, accuracy * 100))
+print("Test finished in {:.3f}ms".format((time.time() - start) * 1000))
