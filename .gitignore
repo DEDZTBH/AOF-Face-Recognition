@@ -158,10 +158,8 @@ fabric.properties
 # Editor-based Rest Client
 .idea/httpRequests
 
-*.pkl
 *.jpg
 *.jpeg
 *.png
-data
+training_data
 .idea
-tf_models
