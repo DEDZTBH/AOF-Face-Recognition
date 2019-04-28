@@ -16,7 +16,7 @@ frame_scale = 1
 knn_pkl_name = 'knn_1719_preprocess_0_100_neq_2'
 webcam = 0
 skip_frame = True
-confirm_time_ms = 1500
+confirm_time_s = 1.5
 
 # Get a reference to webcam #0 (the default one)
 video_capture = cv2.VideoCapture(webcam)
@@ -37,7 +37,7 @@ def confirm_op(names):
     for n in [x for x in names if x != 'Unknown']:
         if n not in confirming:
             confirming[n] = current_time
-        if (current_time - confirming[n]) >= confirm_time_ms:
+        if (current_time - confirming[n]) >= confirm_time_s:
             if n not in confirmed:
                 confirmed.append(n)
 
@@ -81,8 +81,6 @@ while True:
         bottom = round(bottom / frame_scale)
         left = round(left / frame_scale)
 
-        # frame = small_frame
-
         color = (0, 255, 0) if name in confirmed else (0, 0, 255)
 
         # Draw a box around the face
@@ -103,7 +101,7 @@ while True:
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-    # print('Frame takes {:2f}ms'.format((time.time() - start) * 1000))
+    print('Frame takes {:2f}ms'.format((time.time() - start) * 1000))
 
 # Release handle to the webcam
 video_capture.release()
