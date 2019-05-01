@@ -5,6 +5,7 @@ from sklearn import svm
 
 from preprocess.processor_num_map import get_processed_data
 from test_data import test_manager
+from test_data.test_manager import results_accuracy
 
 (new_X_num, num_map, new_y_num,
  max_t_s_num,
@@ -53,8 +54,10 @@ def predict(arr_face, svms, print_time=False):
 if __name__ == '__main__':
     svms = train()
     arr_face = [new_X_num[0], new_X_num[2]]
-    test_manager.test(
+    test_result = test_manager.test(
         predict_fn=lambda arr_face:
         predict(arr_face, svms, True),
         show_image=False
     )
+    accuracy = results_accuracy(test_result)
+    print("Accuracy is {:.2f}%".format(accuracy * 100))
