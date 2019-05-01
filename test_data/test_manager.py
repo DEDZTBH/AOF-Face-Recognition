@@ -1,9 +1,11 @@
 import face_recognition
-from PIL import Image
+from PIL import Image, ImageFont, ImageDraw
 
-from knn import show_prediction_labels_on_image
 from util.general import load_or_create, save
 from os import path
+import numpy as np
+
+font = ImageFont.truetype('fonts/Arial Bold.ttf', 12)
 
 test_data_file_name = 'test_data'
 test_data_folder_name = path.join('data', 'test_data')
@@ -57,6 +59,30 @@ def results_accuracy(results):
         correct += result[1]
         total += result[2]
     return correct / total
+
+
+def show_prediction_labels_on_image(X_img, face_locations, predictions):
+    """
+    Shows the face recognition results visually.
+    :param X_img: pil image to be recognized
+    :param predictions: results of the predict function
+    :return:
+    """
+    draw = ImageDraw.Draw(X_img)
+
+    # Loop through each face found in the unknown image
+    for (top, right, bottom, left), name in zip(face_locations, predictions):
+        # Draw a box around the face using the Pillow module
+        draw.rectangle(((left, top), (right, bottom)), outline=(0, 0, 255))
+
+        draw.text((left + 6, bottom + np.random.randint(0, 20)), str(name),
+                  fill=(0, 210, 0, 255), font=font)
+
+    # Remove the drawing library from memory as per the Pillow docs
+    del draw
+
+    # Display the resulting image
+    X_img.show()
 
 
 analyze_file_name = '3.jpg'

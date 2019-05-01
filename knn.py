@@ -1,10 +1,6 @@
 import math
 from sklearn import neighbors
-from PIL import ImageDraw, ImageFont
-import random
 import time
-
-font = ImageFont.truetype('fonts/Arial Bold.ttf', 12)
 
 
 def knn_generate(X, y, n_neighbors=None, knn_algo='ball_tree', verbose=False):
@@ -46,27 +42,3 @@ def predict(X_encodings, knn_clf, distance_threshold=0.6, n_neighbors=1, print_t
     # Predict classes and remove classifications that aren't within the threshold
     return [pred if rec else "Unknown" for pred, rec in
             zip(knn_clf.predict(X_encodings), are_matches)]
-
-
-def show_prediction_labels_on_image(X_img, face_locations, predictions):
-    """
-    Shows the face recognition results visually.
-    :param X_img: pil image to be recognized
-    :param predictions: results of the predict function
-    :return:
-    """
-    draw = ImageDraw.Draw(X_img)
-
-    # Loop through each face found in the unknown image
-    for (top, right, bottom, left), name in zip(face_locations, predictions):
-        # Draw a box around the face using the Pillow module
-        draw.rectangle(((left, top), (right, bottom)), outline=(0, 0, 255))
-
-        draw.text((left + 6, bottom + random.randint(0, 20)), str(name),
-                  fill=(0, 210, 0, 255), font=font)
-
-    # Remove the drawing library from memory as per the Pillow docs
-    del draw
-
-    # Display the resulting image
-    X_img.show()
