@@ -12,7 +12,10 @@ class AOFPhotosSpider(scrapy.Spider):
 
     def start_requests(self):
         urls = [
-            'https://aof-studios.photoshelter.com/gallery-collection/2018-2019-School-Year/C0000Awpd5DVwCGY'
+            'https://aof-studios.photoshelter.com/gallery-collection/2018-2019-School-Year/C0000Awpd5DVwCGY',
+            'https://aof-studios.photoshelter.com/gallery-collection/2018-2019-School-year/C0000x4ZrVzjGW_I',
+            'https://aof-studios.photoshelter.com/gallery-collection/2018-2019-School-year/C00004eieoULCCiY',
+            'https://aof-studios.photoshelter.com/gallery-collection/2018-2019-School-year/C0000t4Uhq2M6hC8'
         ]
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
@@ -32,8 +35,9 @@ class AOFPhotosSpider(scrapy.Spider):
         pic_urls = [u.replace('200x200', '500x500') for u in pic_urls]
 
         for name, url in zip(pic_names, pic_urls):
-            r = requests.get(url)
-            open(path.join(save_path, name), 'wb').write(r.content)
+            if 'Head' in name:
+                r = requests.get(url)
+                open(path.join(save_path, name), 'wb').write(r.content)
 
         next_page_maybe = response.css('.page_next')
 

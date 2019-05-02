@@ -163,3 +163,4 @@ fabric.properties
 *.png
 training_data
 .idea
+util/aofphotos/known
