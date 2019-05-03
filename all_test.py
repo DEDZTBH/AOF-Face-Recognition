@@ -41,7 +41,7 @@ testing_predictors = [
         model_name='svm_y'
     ),
     NNPredictor(
-        model_name='nn_y_1000_64',
+        model_name='nn_y_1000_64_tanh',
         tolerance=tolerance,
         print_time=False
     )
@@ -49,7 +49,7 @@ testing_predictors = [
 
 hist_accs = [[] for _ in testing_predictors]
 hist_tol = []
-step = 0.005
+step = 0.001
 start = time.time()
 for tolerance in np.arange(0, 1 + step, step):
     for idx, predictor in enumerate(testing_predictors):
@@ -69,9 +69,13 @@ for tolerance in np.arange(0, 1 + step, step):
     hist_tol.append(tolerance)
 
 for hist_acc in hist_accs:
-    plt.plot(hist_tol, hist_acc, linestyle='dashed')
+    magic = 1.5 + np.random.rand() * 3
+    plt.plot(hist_tol, hist_acc,
+             linestyle='dashed',
+             dashes=(magic, magic))
 plt.title('model accuracy')
 plt.ylabel('accuracy')
 plt.xlabel('tolerance')
-plt.legend([predictor.__class__.__name__ for predictor in testing_predictors], loc='upper left')
+plt.legend([predictor.__class__.__name__.replace('Predictor', '') for predictor in testing_predictors],
+           loc='upper left')
 plt.show(figsize=(1920, 1080))

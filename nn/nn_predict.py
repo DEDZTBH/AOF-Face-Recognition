@@ -13,7 +13,9 @@ from util.predictor import EncodingsPredictor, get_param, get_param_default
 epochs = 1000
 batch_size = 64
 
-file_name = 'nn_y_{}_{}'.format(epochs, batch_size)
+extra = '_tanh'
+
+file_name = 'nn_y_{}_{}{}'.format(epochs, batch_size, extra)
 file_path = path.join('data', 'model', 'nn', '{}.hdf5'.format(file_name))
 
 
@@ -23,7 +25,7 @@ def train_nn(new_X_num, new_y_num, num_student, num_map, save=False):
     num_classes = num_student
 
     recog_model = Sequential([
-        Dense(128, activation="relu", input_dim=128),
+        Dense(128, activation="tanh", input_dim=128),
         Dense(num_classes, activation="softmax")
     ])
 
