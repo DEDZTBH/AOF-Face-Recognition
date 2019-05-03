@@ -1,7 +1,8 @@
 from os import path
 
 from preprocess.preprocess_util import training_set_to_dict, dict_to_training_set
-from util.general import dict_keys_map_to_numbers, load_or_create
+from util.general import dict_keys_map_to_numbers
+from util.file import load_or_create
 import preprocess.processor as raw_processor
 import copy
 
@@ -16,7 +17,7 @@ file_name = None
 def get_processed_data(generate_extra_for_each=generate_extra_for_each,
                        encoding_jitters=encoding_jitters, orig_jitters=orig_jitters, neq=neq):
     def _get_processed_data():
-        (new_X, new_X_raw, new_y,
+        (new_X, new_y,
          max_t_s_num,
          num_student,
          orig_new_X, orig_new_y) = raw_processor.get_processed_data(
@@ -50,7 +51,7 @@ def get_processed_data(generate_extra_for_each=generate_extra_for_each,
                 orig_new_X_num, orig_new_y)
 
     global file_name
-    file_name = 'preprocess_num_map_{}_{}{}'.format(generate_extra_for_each, encoding_jitters,
+    file_name = 'preprocess_num_map_y_{}_{}{}'.format(generate_extra_for_each, encoding_jitters,
                                                     '_neq' if neq else '')
 
     magic_obj = load_or_create(file_name, create_fn=_get_processed_data,

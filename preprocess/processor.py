@@ -1,7 +1,8 @@
 from preprocess.preprocess_util import get_face_pics, training_set_to_dict, max_training_set_num, \
     get_equal_number_training_set, \
     dict_to_training_set, get_encoding_for_known_face, shuffle_training_data, generate_gitter_image
-from util.general import transform_2017_photos, load_or_create
+from util.general import transform_yearbook_photos
+from util.file import load_or_create
 import copy
 from os import path
 
@@ -12,13 +13,14 @@ generate_extra_for_each = 0 \
 encoding_jitters = 100
 orig_jitters = 1
 file_name = None
+extra = '_y'
 
 
 def get_processed_data(generate_extra_for_each=generate_extra_for_each,
                        encoding_jitters=encoding_jitters, orig_jitters=orig_jitters, neq=neq, aug=aug):
     def _get_processed_data():
         known_faces, known_names = get_face_pics(path.join('training_data', 'known'),
-                                                 file_name_transform=transform_2017_photos)
+                                                 file_name_transform=transform_yearbook_photos)
         X_y_dict = training_set_to_dict(known_faces, known_names)
         num_student = len(X_y_dict.keys())
         max_t_s_num = max_training_set_num(X_y_dict)
@@ -46,14 +48,14 @@ def get_processed_data(generate_extra_for_each=generate_extra_for_each,
         new_X = get_encoding_for_known_face(new_X_raw, rescan=False, num_jitters=encoding_jitters)
         orig_new_X = get_encoding_for_known_face(orig_new_X_raw, rescan=False, num_jitters=orig_jitters)
 
-        return (new_X, new_X_raw, new_y,
+        return (new_X, new_y,
                 max_t_s_num,
                 num_student,
                 orig_new_X, orig_new_y)
 
     global file_name
-    file_name = 'preprocess_{}_{}{}{}'.format(generate_extra_for_each, encoding_jitters, '_neq' if neq else '',
-                                              '_aug' if aug else '')
+    file_name = 'preprocess{}_{}_{}{}{}'.format(extra, generate_extra_for_each, encoding_jitters, '_neq' if neq else '',
+                                                '_aug' if aug else '')
 
     magic_obj = load_or_create(file_name, create_fn=_get_processed_data,
                                folder=path.join('data', 'cache', 'preprocess'))
@@ -66,7 +68,7 @@ def get_file_name():
 
 
 if __name__ == '__main__':
-    (new_X, new_X_raw, new_y,
+    (new_X, new_y,
      max_t_s_num,
      num_student,
      orig_new_X, orig_new_y) = get_processed_data()

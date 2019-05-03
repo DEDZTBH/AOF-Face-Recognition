@@ -9,8 +9,8 @@ import os
 import sys
 sys.path.append(os.getcwd())
 
-from knn import predict
-from util.general import load
+from knn.knn_predict import predict
+from util.file import load
 
 frame_scale = 1
 knn_pkl_name = 'knn_1719_preprocess_0_100_neq_2'

@@ -1,8 +1,6 @@
 import math
 import re
-import pickle
 import numpy as np
-from os import path
 
 
 def face_distance_to_conf(face_distance, face_match_threshold):
@@ -16,41 +14,15 @@ def face_distance_to_conf(face_distance, face_match_threshold):
         return linear_val + ((1.0 - linear_val) * math.pow((linear_val - 0.5) * 2, 0.2))
 
 
-regex_exp = r'^[0-9.]*([A-Za-z \-\']+\.[A-Za-z \-\']+)\..*$'
+regex_exp = r'^[0-9.]*([A-Za-z \-\'\’]+\.[A-Za-z \-\'\’]+)\..*$'
 
 
-def transform_2017_photos(filename):
-    # print(filename)
-    p = re.match(regex_exp, filename).group(1).replace('.', ' ')
-    # print(p)
-    return p
-
-
-def save(stuff, filename, ext='pkl', folder='data'):
-    with open(path.join(folder, '{}.{}'.format(filename, ext)), 'wb') as file:
-        pickle.dump(stuff, file)
-
-
-def load(filename, ext='pkl', folder='data'):
-    with open(path.join(folder, '{}.{}'.format(filename, ext)), 'rb') as file:
-        return pickle.load(file)
-
-
-def load_or_create(filename, ext='pkl', create_fn=None, folder='data', with_status=False):
+def transform_yearbook_photos(filename):
     try:
-        magic_obj = load(filename, ext, folder)
-        status = True
-    except FileNotFoundError:
-        status = False
-        if create_fn is None:
-            magic_obj = None
-        else:
-            magic_obj = create_fn()
-            save(magic_obj, filename, ext, folder)
-    if with_status:
-        return status, magic_obj
-    else:
-        return magic_obj
+        p = re.match(regex_exp, filename).group(1).replace('.', ' ')
+    except AttributeError:
+        raise AttributeError('{} in wrong format'.format(filename))
+    return p
 
 
 def dict_keys_map_to_numbers(dic, generate_new_dict=True, existing_keys_map=None):

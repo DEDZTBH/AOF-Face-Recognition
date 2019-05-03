@@ -4,7 +4,7 @@ import numpy as np
 from pandas import DataFrame
 import matplotlib.pyplot as plt
 
-(new_X, new_X_raw, new_y,
+(new_X, new_y,
  max_t_s_num,
  num_student,
  test_new_X, test_new_y) = get_processed_data()

@@ -1,9 +1,11 @@
 import face_recognition
 from PIL import Image, ImageFont, ImageDraw
 
-from util.general import load_or_create, save
+from util.file import load_or_create, save
 from os import path
 import numpy as np
+
+from util.predictor import EncodingsPredictor
 
 font = ImageFont.truetype('fonts/Arial Bold.ttf', 12)
 
@@ -50,6 +52,13 @@ def test(predict_fn, show_image=False, print_info=True):
             if print_info:
                 print('Recognition accuracy on {} is {:.2f}%'.format(file_name, (correct_count / num_face * 100)))
     return record
+
+
+def test_predictor(predictor, show_image=False, print_info=True):
+    if isinstance(predictor, EncodingsPredictor):
+        return test(predict_fn=predictor.predict, show_image=show_image, print_info=print_info)
+    else:
+        raise ValueError('Need a EncodingsPredictor')
 
 
 def results_accuracy(results):

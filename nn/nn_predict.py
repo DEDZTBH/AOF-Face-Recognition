@@ -1,3 +1,4 @@
+import pickle
 import time
 from os import path
 
@@ -7,26 +8,16 @@ from tensorflow.python import keras
 from tensorflow.python.keras.models import Sequential, save_model, load_model
 from tensorflow.python.keras.layers import Dense
 
-from preprocess.processor_num_map import get_processed_data
-import matplotlib.pyplot as plt
-
-from test_data import test_manager
-from test_data.test_manager import results_accuracy
-from util.general import load_or_create
-
-(new_X_num, num_map, new_y_num,
- max_t_s_num,
- num_student,
- orig_new_X_num, orig_new_y) = get_processed_data()
+from util.predictor import EncodingsPredictor, get_param, get_param_default
 
 epochs = 1000
 batch_size = 64
 
-file_name = 'nn_{}_{}'.format(epochs, batch_size)
+file_name = 'nn_y_{}_{}'.format(epochs, batch_size)
 file_path = path.join('data', 'model', 'nn', '{}.hdf5'.format(file_name))
 
 
-def train(save=False):
+def train_nn(new_X_num, new_y_num, num_student, num_map, save=False):
     start = time.time()
 
     num_classes = num_student
@@ -67,16 +58,18 @@ def train(save=False):
 
     print('Trained NN model in {:.3f}ms'.format((time.time() - start) * 1000))
 
-    if (save):
+    if save:
         save_model(
             model=recog_model,
             filepath=file_path
         )
+        with open('{}.num_map.pkl'.format(file_path), 'wb') as file:
+            pickle.dump(num_map, file)
 
-    return recog_model
+    return recog_model, num_map
 
 
-def predict(arr_face, recog_model, threshold, print_time=False):
+def predict(arr_face, recog_model, num_map, threshold, print_time=False):
     if print_time:
         start = time.time()
     processed_results = recog_model.predict(np.array(arr_face))
@@ -92,28 +85,27 @@ def predict(arr_face, recog_model, threshold, print_time=False):
     return valid_names
 
 
-if __name__ == '__main__':
-    # recog_model = train(True)
-    recog_model = load_model(
-        file_path
-    )
+def get_file_name():
+    return file_name
 
-    test_result = test_manager.test(
-        predict_fn=lambda arr_face:
-        predict(arr_face, recog_model, 0.52, True),
-        show_image=True
-    )
-    accuracy = results_accuracy(test_result)
-    print("Accuracy is {:.2f}%".format(accuracy * 100))
 
-    # start = time.time()
-    # for tolerance in np.arange(0.40, 0.61, 0.01):
-    #     test_result = test_manager.test(
-    #         predict_fn=
-    #         lambda face_encodings: predict(face_encodings, recog_model, tolerance, False),
-    #         show_image=False,
-    #         print_info=False
-    #     )
-    #     accuracy = results_accuracy(test_result)
-    #     print("At a tolerance of {:.2f}, accuracy is {:.2f}%".format(tolerance, accuracy * 100))
-    # print("Test finished in {:.3f}ms".format((time.time() - start) * 1000))
+def get_file_path():
+    return file_path
+
+
+class NNPredictor(EncodingsPredictor):
+    def __init__(self, **kwargs):
+        self.model_name = get_param('model_name', kwargs)
+        file_path = path.join('data', 'model', 'nn', '{}.hdf5'.format(self.model_name))
+        self.recog_model = load_model(file_path)
+        with open('{}.num_map.pkl'.format(file_path), 'rb') as file:
+            self.num_map = pickle.load(file)
+        self.tolerance = get_param_default('tolerance', 0.54, kwargs)
+        self.print_time = get_param_default('print_time', False, kwargs)
+
+    def predict(self, face_encodings):
+        return predict(arr_face=face_encodings,
+                       recog_model=self.recog_model,
+                       threshold=self.tolerance,
+                       num_map=self.num_map,
+                       print_time=self.print_time)

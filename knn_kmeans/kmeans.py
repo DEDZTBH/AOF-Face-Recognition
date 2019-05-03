@@ -7,7 +7,7 @@ import tensorflow as tf
 from tensorflow.contrib.factorization import KMeans
 
 from preprocess.processor_num_map import get_processed_data
-from util.general import save
+from util.file import save
 
 # Parameters
 num_steps = 5000
