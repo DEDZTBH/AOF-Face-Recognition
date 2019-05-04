@@ -7,13 +7,15 @@ import face_recognition
 # For windows
 import os
 import sys
+
+from knn.knn_predict import KNNPredictor
+from knn_kmeans.knn_kmeans_predict import KNNKmeansPredictor
+from nn.nn_predict import NNPredictor
+from svm.svm_predict import SVMPredictor
+
 sys.path.append(os.getcwd())
 
-from knn.knn_predict import predict
-from util.file import load
-
 frame_scale = 1
-knn_pkl_name = 'knn_1719_preprocess_0_100_neq_2'
 webcam = 0
 skip_frame = True
 confirm_time_s = 1.5
@@ -29,7 +31,9 @@ confirming = {}
 confirmed = []
 process_this_frame = True
 
-knn_model = load(knn_pkl_name, folder=path.join('data', 'model', 'knn'))
+predictor = SVMPredictor(
+        model_name='svm_y'
+    )
 
 
 def confirm_op(names):
@@ -60,14 +64,10 @@ while True:
     # Only process every other frame of video to save time
     if process_this_frame:
         # Find all the faces and face encodings in the current frame of video
-        face_locations = face_recognition.face_locations(rgb_small_frame, model='cnn')
+        face_locations = face_recognition.face_locations(rgb_small_frame, model='hog')
         face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
-        face_names = predict(face_encodings,
-                             knn_model,
-                             distance_threshold=0.52,
-                             n_neighbors=2,
-                             print_time=False)
+        face_names = predictor.predict(face_encodings)
 
         confirm_op(face_names)
         # print(confirming)

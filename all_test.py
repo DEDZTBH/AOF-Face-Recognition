@@ -68,14 +68,19 @@ for tolerance in np.arange(0, 1 + step, step):
             hist_accs[idx].append(hist_accs[idx][0])
     hist_tol.append(tolerance)
 
+
+ax = plt.figure().gca()
+ax.set_xticks(np.arange(0, 1.001, 0.05))
+ax.set_yticks(np.arange(0, 1.001, 0.05))
 for hist_acc in hist_accs:
     magic = 1.5 + np.random.rand() * 3
     plt.plot(hist_tol, hist_acc,
              linestyle='dashed',
              dashes=(magic, magic))
+plt.grid()
 plt.title('model accuracy')
 plt.ylabel('accuracy')
 plt.xlabel('tolerance')
 plt.legend([predictor.__class__.__name__.replace('Predictor', '') for predictor in testing_predictors],
            loc='upper left')
-plt.show(figsize=(1920, 1080))
+plt.show(figsize=(2520, 1080))

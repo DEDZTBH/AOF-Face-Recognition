@@ -54,7 +54,8 @@ class SVMPredictor(EncodingsPredictor):
         self.print_time = get_param_default('print_time', False, kwargs)
 
     def predict(self, face_encodings):
-        return predict(arr_face=face_encodings,
-                       svms=self.svms,
-                       num_map=self.num_map,
-                       print_time=self.print_time)
+        return [] if len(face_encodings) == 0 else \
+            predict(arr_face=face_encodings,
+                    svms=self.svms,
+                    num_map=self.num_map,
+                    print_time=self.print_time)
