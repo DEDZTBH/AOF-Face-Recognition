@@ -109,7 +109,7 @@ class NNPredictor(EncodingsPredictor):
             self.num_map = pickle.load(file)
         self.tolerance = get_param_default('tolerance', 0.54, kwargs)
         self.print_time = get_param_default('print_time', False, kwargs)
-        self.convert_power = get_param_default('convert_power', 0.2, kwargs)
+        self.convert_power = get_param_default('convert_power', 0.3, kwargs)
 
     def predict(self, face_encodings):
         return [] if len(face_encodings) == 0 else \
