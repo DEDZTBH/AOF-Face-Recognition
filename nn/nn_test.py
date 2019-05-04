@@ -32,30 +32,39 @@ except OSError:
 # accuracy = results_accuracy(test_result)
 # print("Accuracy is {:.2f}%".format(accuracy * 100))
 
-hist_acc = []
-hist_tol = []
 step = 0.005
 start = time.time()
+legend = []
 i_NNPredictor = NNPredictor(
     model_name=get_file_name(),
     tolerance=0,
+    convert_power=0,
     print_time=False
 )
-for tolerance in np.arange(0, 1 + step, step):
-    i_NNPredictor.tolerance = tolerance
-    test_result = test_manager.test_predictor(
-        predictor=i_NNPredictor,
-        show_image=False,
-        print_info=False
-    )
-    accuracy = results_accuracy(test_result)
-    print("At a tolerance of {:.3f}, accuracy is {:.2f}%".format(tolerance, accuracy * 100))
-    hist_acc.append(accuracy)
-    hist_tol.append(tolerance)
-print("Test finished in {:.3f}ms".format((time.time() - start) * 1000))
 
-plt.plot(hist_tol, hist_acc)
+for convert_power in np.arange(0.1, 1.1, 0.1):
+    i_NNPredictor.convert_power = convert_power
+
+    hist_acc = []
+    hist_tol = []
+
+    for tolerance in np.arange(0, 1 + step, step):
+        i_NNPredictor.tolerance = tolerance
+        test_result = test_manager.test_predictor(
+            predictor=i_NNPredictor,
+            show_image=False,
+            print_info=False
+        )
+        accuracy = results_accuracy(test_result)
+        print("At a tolerance of {:.3f}, accuracy is {:.2f}%".format(tolerance, accuracy * 100))
+        hist_acc.append(accuracy)
+        hist_tol.append(tolerance)
+    print("Test finished in {:.3f}ms".format((time.time() - start) * 1000))
+    legend.append('{:.1f}'.format(convert_power))
+    plt.plot(hist_tol, hist_acc)
+
 plt.title('model accuracy')
 plt.ylabel('accuracy')
 plt.xlabel('tolerance')
+plt.legend(legend, loc='best')
 plt.show()
