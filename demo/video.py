@@ -10,11 +10,13 @@ import sys
 
 sys.path.append(os.getcwd())
 
-from knn import predict
-from util.general import load
+from knn.knn_predict import KNNPredictor
+from knn_kmeans.knn_kmeans_predict import KNNKmeansPredictor
+from nn.nn_predict import NNPredictor
+from svm.svm_predict import SVMPredictor
 
-frame_scale = 0.65
-knn_pkl_name = 'knn_1719_preprocess_0_100_neq_2'
+frame_scale = 1
+
 
 # Open the input movie file
 input_movie = cv2.VideoCapture("test.mp4")
@@ -36,7 +38,12 @@ face_locations = []
 face_encodings = []
 face_names = []
 
-knn_model = load(knn_pkl_name, folder=path.join('data', 'model', 'knn'))
+predictor = NNPredictor(
+        model_name='nn_y_1000_64_tanh',
+        tolerance=0.55,
+        print_time=False
+)
+
 frame_number = 0
 
 while True:
@@ -56,14 +63,10 @@ while True:
     rgb_small_frame = small_frame[:, :, ::-1]
 
     # Find all the faces and face encodings in the current frame of video
-    face_locations = face_recognition.face_locations(rgb_small_frame, model='cnn')
+    face_locations = face_recognition.face_locations(rgb_small_frame, model='hog')
     face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
-    face_names = predict(face_encodings,
-                         knn_model,
-                         distance_threshold=0.5,
-                         n_neighbors=2,
-                         print_time=False)
+    face_names = predictor.predict(face_encodings)
 
     # Display the results
     for (top, right, bottom, left), name in zip(face_locations, face_names):

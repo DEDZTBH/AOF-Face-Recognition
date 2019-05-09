@@ -8,12 +8,12 @@ import face_recognition
 import os
 import sys
 
+sys.path.append(os.getcwd())
+
 from knn.knn_predict import KNNPredictor
 from knn_kmeans.knn_kmeans_predict import KNNKmeansPredictor
 from nn.nn_predict import NNPredictor
 from svm.svm_predict import SVMPredictor
-
-sys.path.append(os.getcwd())
 
 frame_scale = 1
 webcam = 0
@@ -31,9 +31,11 @@ confirming = {}
 confirmed = []
 process_this_frame = True
 
-predictor = SVMPredictor(
-        model_name='svm_y'
-    )
+predictor = NNPredictor(
+        model_name='nn_y_1000_64_tanh',
+        tolerance=0.55,
+        print_time=False
+)
 
 
 def confirm_op(names):
