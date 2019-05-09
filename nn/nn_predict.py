@@ -72,7 +72,7 @@ def train_nn(new_X_num, new_y_num, num_student, num_map, save=False):
     return recog_model, num_map
 
 
-def predict(arr_face, recog_model, num_map, threshold, face_distance_table=None, convert_power=0.2, print_time=False):
+def predict(arr_face, recog_model, num_map, threshold, face_distance_table=None, convert_power=0.3, print_time=False):
     if print_time:
         start = time.time()
     processed_results = recog_model.predict(np.array(arr_face))

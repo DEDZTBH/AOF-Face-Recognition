@@ -1,5 +1,4 @@
 import time
-from os import path
 
 import cv2
 import face_recognition

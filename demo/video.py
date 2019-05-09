@@ -1,5 +1,4 @@
 import time
-from os import path
 
 import cv2
 import face_recognition
@@ -16,7 +15,6 @@ from nn.nn_predict import NNPredictor
 from svm.svm_predict import SVMPredictor
 
 frame_scale = 1
-
 
 # Open the input movie file
 input_movie = cv2.VideoCapture("test.mp4")
@@ -39,9 +37,9 @@ face_encodings = []
 face_names = []
 
 predictor = NNPredictor(
-        model_name='nn_y_1000_64_tanh',
-        tolerance=0.55,
-        print_time=False
+    model_name='nn_y_1000_64_tanh',
+    tolerance=0.55,
+    print_time=False
 )
 
 frame_number = 0
@@ -63,7 +61,7 @@ while True:
     rgb_small_frame = small_frame[:, :, ::-1]
 
     # Find all the faces and face encodings in the current frame of video
-    face_locations = face_recognition.face_locations(rgb_small_frame, model='hog')
+    face_locations = face_recognition.face_locations(rgb_small_frame, number_of_times_to_upsample=2, model='hog')
     face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
     face_names = predictor.predict(face_encodings)
