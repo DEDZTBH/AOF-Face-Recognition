@@ -61,8 +61,8 @@ testing_predictors = [
     )
 ]
 
-step = 25
-num_encodings = np.arange(1, 1000 + step, step)
+step = 10
+num_encodings = np.arange(1, 400 + step, step)
 time_results_s = [[0 for _ in num_encodings] for _ in testing_predictors]
 
 # prepare
