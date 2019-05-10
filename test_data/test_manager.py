@@ -13,11 +13,16 @@ font = ImageFont.truetype('fonts/Arial Bold.ttf', 12)
 test_data_file_name = 'test_data_640'
 test_data_folder_name = path.join('data', 'test_data')
 
+test_data_cache = None
+
 
 def get():
-    return load_or_create(filename=test_data_file_name,
-                          create_fn=lambda: [],
-                          folder=test_data_folder_name)
+    global test_data_cache
+    if test_data_cache is None:
+        test_data_cache = load_or_create(filename=test_data_file_name,
+                                         create_fn=lambda: [],
+                                         folder=test_data_folder_name)
+    return test_data_cache
 
 
 def add(file_name, face_locations, face_encodings, face_answers):

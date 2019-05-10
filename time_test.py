@@ -9,9 +9,9 @@ from test_data import test_manager
 import numpy as np
 import matplotlib.pyplot as plt
 
-trial_times = 10
+trial_times = 2
 tolerance = 0.55
-prepare_times = 10
+prepare_times = 0
 
 (new_X, new_y,
  max_t_s_num,
@@ -61,31 +61,33 @@ testing_predictors = [
     )
 ]
 
-step = 10
-num_encodings = np.arange(1, 200 + step, step)
+step = 25
+num_encodings = np.arange(1, 1000 + step, step)
 time_results_s = [[0 for _ in num_encodings] for _ in testing_predictors]
 
 # prepare
 for i in range(prepare_times):
     encodings_to_test = test_manager.randomly_pick_encodings(num_encodings)
-    print('Test {}'.format(i))
+    len_encodings_to_test = len(encodings_to_test)
+    print('Test {}/{}'.format(i+1, prepare_times))
     for e_i, encodings in enumerate(encodings_to_test):
         for p_i, predictor in enumerate(testing_predictors):
             predictor.predict(encodings)
-            if p_i == 0 and e_i % 10 == 1:
-                print('Encodings: {}'.format(e_i))
+            if p_i == 0:
+                print('Encodings: {}/{}'.format(e_i+1, len_encodings_to_test))
 
 for trial_time in range(trial_times):
     encodings_to_test = test_manager.randomly_pick_encodings(num_encodings)
-    print('Trial {}'.format(trial_time))
+    len_encodings_to_test = len(encodings_to_test)
+    print('Trial {}/{}'.format(trial_time+1, trial_times))
     for e_i, encodings in enumerate(encodings_to_test):
         for p_i, predictor in enumerate(testing_predictors):
             start()
             predictor.predict(encodings)
             elapse = stop()
             time_results_s[p_i][e_i] += elapse
-            if p_i == 0 and e_i % 10 == 1:
-                print('Encodings: {}'.format(e_i))
+            if p_i == 0:
+                print('Encodings: {}/{}'.format(e_i+1, len_encodings_to_test))
 
 time_results_s = np.array(time_results_s) / trial_times * 1000
 
