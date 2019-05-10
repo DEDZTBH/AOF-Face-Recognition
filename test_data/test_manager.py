@@ -5,6 +5,7 @@ from util.file import load_or_create, save
 from os import path
 import numpy as np
 
+from util.general import random_rows
 from util.predictor import EncodingsPredictor
 
 font = ImageFont.truetype('fonts/Arial Bold.ttf', 12)
@@ -172,3 +173,13 @@ def test_these(pics_l_e, predictor, show_img=True):
 def add_test_these(pics_l_e, names):
     for (_, face_locations, face_encodings), name in zip(pics_l_e, names):
         add(test_data_file_name, face_locations, face_encodings, name)
+
+
+def randomly_pick_encodings(num_range=None):
+    if num_range is None:
+        num_range = [1]
+    test_data = get()
+    all_encodings = []
+    for test_datum in test_data:
+        all_encodings += test_datum[2]
+    return [random_rows(np.array(all_encodings), a, replace=True) for a in num_range]

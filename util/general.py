@@ -34,5 +34,5 @@ def decode_num_map(encoded_arr, num_map):
     return [num_map[i] for i in encoded_arr]
 
 
-def random_rows(A, num_rows):
-    return A[np.random.choice(A.shape[0], num_rows, replace=False), :]
+def random_rows(A, num_rows, replace=False):
+    return A[np.random.choice(A.shape[0], num_rows, replace=replace), :]

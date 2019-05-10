@@ -30,10 +30,12 @@ confirming = {}
 confirmed = []
 process_this_frame = True
 
+tolerance = 0.55
+
 predictor = NNPredictor(
-        model_name='nn_y_1000_64_tanh',
-        tolerance=0.55,
-        print_time=False
+    model_name='nn_y_1000_64_tanh',
+    tolerance=tolerance,
+    print_time=False
 )
 
 

@@ -11,7 +11,7 @@ import numpy as np
 from util.file import load_or_create
 import matplotlib.pyplot as plt
 
-restore = True
+restore = False
 
 (new_X_num, num_map, new_y_num,
  max_t_s_num,
