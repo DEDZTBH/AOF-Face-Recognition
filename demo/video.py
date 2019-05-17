@@ -10,9 +10,9 @@ import sys
 sys.path.append(os.getcwd())
 
 from knn.knn_predict import KNNPredictor
-from knn_kmeans.knn_kmeans_predict import KNNKmeansPredictor
+# from knn_kmeans.knn_kmeans_predict import KNNKmeansPredictor
 from nn.nn_predict import NNPredictor
-from svm.svm_predict import SVMPredictor
+# from svm.svm_predict import SVMPredictor
 
 frame_scale = 1
 
@@ -37,8 +37,8 @@ face_encodings = []
 face_names = []
 
 predictor = NNPredictor(
-    model_name='nn_y_1000_64_tanh',
-    tolerance=0.55,
+    model_name='nn_y_500_64_tanh',
+    tolerance=0.65,
     print_time=False
 )
 
@@ -61,7 +61,7 @@ while True:
     rgb_small_frame = small_frame[:, :, ::-1]
 
     # Find all the faces and face encodings in the current frame of video
-    face_locations = face_recognition.face_locations(rgb_small_frame, number_of_times_to_upsample=2, model='hog')
+    face_locations = face_recognition.face_locations(rgb_small_frame, number_of_times_to_upsample=1, model='hog')
     face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
     face_names = predictor.predict(face_encodings)

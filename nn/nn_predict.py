@@ -8,10 +8,13 @@ from tensorflow.python import keras
 from tensorflow.python.keras.models import Sequential, save_model, load_model
 from tensorflow.python.keras.layers import Dense
 
+import matplotlib.pyplot as plt
+
+from test_data import test_manager
 from util.confidence import conf_to_face_distance, face_distance_to_conf
 from util.predictor import EncodingsPredictor, get_param, get_param_default
 
-epochs = 1000
+epochs = 500
 batch_size = 64
 
 extra = '_tanh'
@@ -25,6 +28,8 @@ def train_nn(new_X_num, new_y_num, num_student, num_map, save=False):
 
     num_classes = num_student
 
+    val_data = test_manager.generate_validation_data(exclude_unknown=True, num_map=num_map)
+
     recog_model = Sequential([
         Dense(128, activation="tanh", input_dim=128),
         Dense(num_classes, activation="softmax")
@@ -32,32 +37,33 @@ def train_nn(new_X_num, new_y_num, num_student, num_map, save=False):
 
     recog_model.compile(loss=keras.losses.sparse_categorical_crossentropy,
                         optimizer='adam',
-                        # metrics=['accuracy']
+                        metrics=['accuracy']
                         )
 
     training_history = recog_model.fit(
         np.array(new_X_num),
         np.array(new_y_num),
+        validation_data=val_data,
         batch_size=batch_size,
         epochs=epochs
     )
 
-    # # summarize history for accuracy
-    # plt.plot(training_history.history['acc'])
-    # # plt.plot(training_history.history['val_acc'])
-    # plt.title('model accuracy')
-    # plt.ylabel('accuracy')
-    # plt.xlabel('epoch')
-    # plt.legend(['train', 'test'], loc='upper left')
-    # plt.show()
-    # # summarize history for loss
-    # plt.plot(training_history.history['loss'])
-    # # plt.plot(training_history.history['val_loss'])
-    # plt.title('model loss')
-    # plt.ylabel('loss')
-    # plt.xlabel('epoch')
-    # plt.legend(['train', 'test'], loc='upper left')
-    # plt.show()
+    # summarize history for accuracy
+    plt.plot(training_history.history['acc'])
+    plt.plot(training_history.history['val_acc'])
+    plt.title('model accuracy')
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+    # summarize history for loss
+    plt.plot(training_history.history['loss'])
+    plt.plot(training_history.history['val_loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
 
     print('Trained NN model in {:.3f}ms'.format((time.time() - start) * 1000))
 
@@ -109,7 +115,7 @@ class NNPredictor(EncodingsPredictor):
             self.num_map = pickle.load(file)
         self.tolerance = get_param_default('tolerance', 0.54, kwargs)
         self.print_time = get_param_default('print_time', False, kwargs)
-        self.convert_power = get_param_default('convert_power', 0.3, kwargs)
+        self.convert_power = get_param_default('convert_power', 0.5, kwargs)
 
     def predict(self, face_encodings):
         return [] if len(face_encodings) == 0 else \

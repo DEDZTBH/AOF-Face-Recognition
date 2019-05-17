@@ -8,7 +8,7 @@ import numpy as np
 from util.general import random_rows
 from util.predictor import EncodingsPredictor
 
-font = ImageFont.truetype('fonts/Arial Bold.ttf', 12)
+font = ImageFont.truetype(path.join('fonts', 'Arial Bold.ttf'), 12)
 
 test_data_file_name = 'test_data_640'
 test_data_folder_name = path.join('data', 'test_data')
@@ -188,3 +188,17 @@ def randomly_pick_encodings(num_range=None):
     for test_datum in test_data:
         all_encodings += test_datum[2]
     return [random_rows(np.array(all_encodings), a, replace=True) for a in num_range]
+
+
+def generate_validation_data(exclude_unknown=True, num_map=None):
+    result = ([], [])
+    num_map = np.array(num_map)
+    for picture in get():
+        for encodings, name in zip(picture[2], picture[3]):
+            if not exclude_unknown or name != 'Unknown':
+                result[0].append(encodings)
+                if num_map is not None:
+                    result[1].append(np.where(num_map == name)[0][0])
+                else:
+                    result[1].append(name)
+    return np.array(result[0]), np.array(result[1])

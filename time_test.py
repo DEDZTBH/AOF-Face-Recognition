@@ -9,14 +9,14 @@ from test_data import test_manager
 import numpy as np
 import matplotlib.pyplot as plt
 
-trial_times = 2
+trial_times = 5
 tolerance = 0.55
-prepare_times = 0
+prepare_times = 1
 
-(new_X, new_y,
- max_t_s_num,
- num_student,
- orig_new_X, orig_new_y) = get_processed_data()
+# (new_X, new_y,
+#  max_t_s_num,
+#  num_student,
+#  orig_new_X, orig_new_y) = get_processed_data()
 
 
 def start():
@@ -33,12 +33,12 @@ def stop(print_info=False):
 
 
 testing_predictors = [
-    NaivePredictor(
-        known_encodings=new_X,
-        names=new_y,
-        tolerance=tolerance,
-        print_time=False
-    ),
+    # NaivePredictor(
+    #     known_encodings=new_X,
+    #     names=new_y,
+    #     tolerance=tolerance,
+    #     print_time=False
+    # ),
     KNNPredictor(
         model_name='knn_preprocess_y_0_100_neq_2',
         n=2,
@@ -55,7 +55,7 @@ testing_predictors = [
         model_name='svm_y'
     ),
     NNPredictor(
-        model_name='nn_y_1000_64_tanh',
+        model_name='nn_y_500_64_tanh',
         tolerance=tolerance,
         print_time=False
     )
@@ -113,4 +113,4 @@ def my_plot(hist_blas, tols, bla, xname='people', legend=None):
     plt.show()
 
 
-my_plot(time_results_s, num_encodings, 'time(ms)')
+my_plot(time_results_s, num_encodings, 'time(ms) on 1070ti')

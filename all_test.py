@@ -3,6 +3,7 @@ import time
 from knn.knn_predict import KNNPredictor
 from knn_kmeans.knn_kmeans_predict import KNNKmeansPredictor
 from nn.nn_predict import NNPredictor
+from svm.svm_predict import SVMPredictor
 from test_data import test_manager
 from test_data.test_manager import results_stat
 import numpy as np
@@ -29,12 +30,13 @@ testing_predictors = [
         tolerance=tolerance,
         print_time=False
     ),
-    # SVMPredictor(
-    #     model_name='svm_y'
-    # ),
+    SVMPredictor(
+        model_name='svm_y'
+    ),
     NNPredictor(
-        model_name='nn_y_1000_64_tanh',
+        model_name='nn_y_500_64_tanh',
         tolerance=tolerance,
+        convert_power=0.5,
         print_time=False
     ),
     # NN_FD_Predictor(
@@ -101,7 +103,7 @@ my_plot(hist_accs, hist_tol, 'accuracy')
 my_plot(hist_fps, hist_tol, 'false positive')
 my_plot(hist_fns, hist_tol, 'false negative')
 
-plot_arr = [0, 2]
+plot_arr = []
 for i in plot_arr:
     my_plot([hist_accs[i], hist_fps[i], hist_fns[i]], hist_tol,
             '{} model'.format(testing_predictors[i].__class__.__name__.replace('Predictor', '')),
