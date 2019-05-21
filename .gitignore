@@ -160,7 +160,6 @@ fabric.properties
 
 *.jpg
 *.jpeg
-*.png
 training_data
 .idea
 util/aofphotos/known

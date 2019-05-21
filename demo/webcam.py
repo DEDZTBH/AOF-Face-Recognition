@@ -9,10 +9,10 @@ import sys
 
 sys.path.append(os.getcwd())
 
-from knn.knn_predict import KNNPredictor
-from knn_kmeans.knn_kmeans_predict import KNNKmeansPredictor
+# from knn.knn_predict import KNNPredictor
+# from knn_kmeans.knn_kmeans_predict import KNNKmeansPredictor
 from nn.nn_predict import NNPredictor
-from svm.svm_predict import SVMPredictor
+# from svm.svm_predict import SVMPredictor
 
 frame_scale = 1
 webcam = 0
@@ -30,10 +30,10 @@ confirming = {}
 confirmed = []
 process_this_frame = True
 
-tolerance = 0.55
+tolerance = 0.625
 
 predictor = NNPredictor(
-    model_name='nn_y_1000_64_tanh',
+    model_name='nn_y_500_64_tanh',
     tolerance=tolerance,
     print_time=False
 )
